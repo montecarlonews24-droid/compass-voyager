@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>بوصلة المسافر | Compass Voyager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root{
+    --deep-navy:#0A3D52;
+    --ocean:#136E8C;
+    --turquoise:#2FBFB0;
+    --seafoam:#CFEFE7;
+    --sand:#F6EDDD;
+    --sand-deep:#EADFC6;
+    --coral:#FF7A5C;
+    --foam:#FFFFFF;
+    --ink:#0E3A44;
+    --ink-soft:#4C7480;
+    --radius-lg:26px;
+    --radius-md:18px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Tajawal',sans-serif;
+    background:var(--sand);
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+  }
+  .device{
+    width:100%;
+    max-width:430px;
+    min-height:100vh;
+    background:var(--sand);
+    position:relative;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{font-family:'Cairo',sans-serif;}
+
+  /* ---------- Wave header ---------- */
+  .wave-header{
+    position:relative;
+    background:linear-gradient(160deg,var(--deep-navy) 0%, var(--ocean) 55%, var(--turquoise) 130%);
+    padding:22px 20px 46px;
+    color:var(--foam);
+    border-radius:0 0 42% 42%/0 0 34px 34px;
+    overflow:hidden;
+  }
+  .wave-header::after{
+    content:"";
+    position:absolute;
+    left:-10%; right:-10%; bottom:-2px; height:26px;
+    background:var(--sand);
+    border-radius:50% 50% 0 0/100% 100% 0 0;
+  }
+  .wave-header .top-row{
+    display:flex; justify-content:space-between; align-items:center;
+    position:relative; z-index:2;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-badge{
+    width:38px;height:38px;border-radius:12px;
+    background:rgba(255,255,255,.14);
+    display:flex;align-items:center;justify-content:center;
+    border:1px solid rgba(255,255,255,.35);
+  }
+  .brand-name{font-weight:800; font-size:16px; letter-spacing:.2px;}
+  .brand-sub{font-size:10.5px; color:var(--seafoam); opacity:.85; margin-top:-2px;}
+  .icon-btn{
+    width:38px;height:38px;border-radius:12px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.3);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--foam);
+  }
+  .hero-line{position:relative; z-index:2; margin-top:20px;}
+  .hero-line h1{font-size:22px; font-weight:800; margin:0 0 4px;}
+  .hero-line p{font-size:12.5px; color:var(--seafoam); margin:0; opacity:.9;}
+
+  /* ---------- Content ---------- */
+  .content{padding:0 18px 100px; margin-top:-24px; position:relative; z-index:3;}
+  .section-title{
+    display:flex; align-items:center; justify-content:space-between;
+    margin:22px 2px 12px;
+  }
+  .section-title h2{font-size:15.5px; font-weight:700; color:var(--deep-navy); margin:0;}
+  .section-title .link{font-size:11.5px; color:var(--ocean); font-weight:700;}
+
+  /* Filter card (Smart Planner) */
+  .filter-card{
+    background:var(--foam);
+    border-radius:var(--radius-lg);
+    padding:18px;
+    box-shadow:0 14px 30px -14px rgba(10,61,82,.25);
+    border:1px solid #ffffff;
+  }
+  .filter-row{display:flex; gap:10px; margin-bottom:10px;}
+  .chip{
+    flex:1; text-align:center; padding:11px 6px;
+    border-radius:14px; font-size:12px; font-weight:700;
+    background:var(--sand); color:var(--ink-soft);
+    border:1.5px solid transparent;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+  }
+  .chip.active{
+    background:linear-gradient(135deg,var(--turquoise),var(--ocean));
+    color:#fff; border-color:transparent;
+    box-shadow:0 8px 16px -8px rgba(19,110,140,.6);
+  }
+  .chip svg{width:18px;height:18px;}
+  .budget-track{
+    background:var(--sand); border-radius:20px; height:8px; margin:14px 2px 6px;
+    position:relative;
+  }
+  .budget-fill{
+    position:absolute; inset:0; width:58%; border-radius:20px;
+    background:linear-gradient(90deg,var(--turquoise),var(--coral));
+  }
+  .budget-labels{display:flex; justify-content:space-between; font-size:10.5px; color:var(--ink-soft); padding:0 2px;}
+  .cta-btn{
+    width:100%; margin-top:16px; padding:14px;
+    background:linear-gradient(135deg,var(--deep-navy),var(--ocean));
+    color:#fff; border:none; border-radius:16px;
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:14.5px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+
+  /* Destination cards */
+  .dest-scroll{display:flex; gap:14px; overflow-x:auto; padding:4px 2px 10px; scrollbar-width:none;}
+  .dest-scroll::-webkit-scrollbar{display:none;}
+  .dest-card{
+    min-width:168px; border-radius:var(--radius-md);
+    overflow:hidden; background:var(--foam);
+    box-shadow:0 12px 22px -14px rgba(10,61,82,.3);
+    flex-shrink:0;
+  }
+  .dest-img{
+    height:100px; width:100%;
+    background:linear-gradient(135deg,var(--turquoise),var(--deep-navy));
+    position:relative; display:flex; align-items:flex-end; padding:8px;
+  }
+  .dest-img .fly-badge{
+    background:rgba(255,255,255,.92); color:var(--deep-navy);
+    font-size:10px; font-weight:700; padding:4px 8px; border-radius:20px;
+    display:flex; align-items:center; gap:4px;
+  }
+  .dest-body{padding:10px 12px 12px;}
+  .dest-body h3{font-size:13.5px; margin:0 0 2px; color:var(--ink);}
+  .dest-body p{font-size:10.5px; color:var(--ink-soft); margin:0;}
+  .dest-tags{display:flex; gap:5px; margin-top:8px;}
+  .tag{font-size:9px; background:var(--seafoam); color:var(--ocean); padding:3px 7px; border-radius:20px; font-weight:700;}
+
+  /* Mode dashboard tabs */
+  .mode-tabs{display:flex; background:var(--sand-deep); border-radius:16px; padding:4px; gap:4px;}
+  .mode-tab{
+    flex:1; text-align:center; padding:9px 4px; border-radius:12px;
+    font-size:11.5px; font-weight:700; color:var(--ink-soft);
+  }
+  .mode-tab.active{background:var(--foam); color:var(--deep-navy); box-shadow:0 6px 14px -8px rgba(10,61,82,.3);}
+
+  .list-item{
+    display:flex; align-items:center; gap:12px;
+    background:var(--foam); border-radius:16px; padding:12px;
+    margin-bottom:10px; box-shadow:0 8px 18px -14px rgba(10,61,82,.25);
+  }
+  .list-icon{
+    width:42px;height:42px;border-radius:12px; flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--seafoam); color:var(--ocean);
+  }
+  .list-icon.coral{background:#FFE7E0; color:var(--coral);}
+  .list-text h4{font-size:13px; margin:0 0 2px; color:var(--ink);}
+  .list-text span{font-size:10.5px; color:var(--ink-soft);}
+  .list-meta{margin-inline-start:auto; text-align:end;}
+  .list-meta b{display:block; font-size:11.5px; color:var(--ocean);}
+  .list-meta small{font-size:9.5px; color:var(--ink-soft);}
+
+  /* Muslim traveler corner */
+  .prayer-strip{
+    display:flex; background:linear-gradient(135deg,var(--deep-navy),var(--ocean));
+    border-radius:18px; padding:14px; color:#fff; align-items:center; gap:12px;
+    margin-bottom:14px;
+  }
+  .prayer-strip .next{flex:1;}
+  .prayer-strip .next span{font-size:10.5px; color:var(--seafoam); display:block;}
+  .prayer-strip .next b{font-family:'Cairo',sans-serif; font-size:19px;}
+  .prayer-mini{display:flex; gap:14px; margin-top:2px; font-size:10px; opacity:.9;}
+  .halal-badge{
+    position:absolute; top:8px; left:8px;
+    background:var(--coral); color:#fff; font-size:9px; font-weight:800;
+    padding:3px 8px; border-radius:20px; display:flex; gap:3px; align-items:center;
+  }
+
+  /* Search bar */
+  .search-bar{
+    display:flex; align-items:center; gap:10px;
+    background:var(--foam); border-radius:16px; padding:12px 14px;
+    box-shadow:0 10px 22px -16px rgba(10,61,82,.3);
+    margin-bottom:14px;
+  }
+  .search-bar input{
+    border:none; outline:none; background:transparent; flex:1;
+    font-family:'Tajawal',sans-serif; font-size:13px; color:var(--ink);
+  }
+  .search-bar svg{color:var(--ocean); flex-shrink:0;}
+
+  /* Bottom nav */
+  .bottom-nav{
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:430px;
+    background:var(--foam);
+    border-radius:26px 26px 0 0;
+    box-shadow:0 -10px 30px -12px rgba(10,61,82,.28);
+    display:flex; justify-content:space-around; align-items:center;
+    padding:12px 6px 18px;
+    z-index:10;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    color:var(--ink-soft); font-size:9.5px; font-weight:700;
+    position:relative; width:56px;
+  }
+  .nav-item.active{color:var(--ocean);}
+  .nav-item.active .nav-dot{
+    width:16px; height:3px; border-radius:6px; background:var(--turquoise);
+    position:absolute; top:-6px;
+  }
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  .fav-toggle{
+    position:absolute; top:8px; right:8px;
+    width:28px;height:28px;border-radius:10px;
+    background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center;
+    color:var(--coral);
+  }
+
+  .divider-label{
+    display:flex; align-items:center; gap:8px; margin:18px 0 10px; color:var(--ink-soft); font-size:11px; font-weight:700;
+  }
+  .divider-label::before, .divider-label::after{content:""; flex:1; height:1px; background:var(--sand-deep);}
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- ================= HOME ================= -->
+  <div class="screen active" id="screen-home">
+    <div class="wave-header">
+      <div class="top-row">
+        <div class="brand">
+          <div class="brand-badge"><i data-lucide="compass" width="20" height="20"></i></div>
+          <div>
+            <div class="brand-name">بوصلة المسافر</div>
+            <div class="brand-sub">Compass Voyager</div>
+          </div>
+        </div>
+        <div class="icon-btn"><i data-lucide="moon" width="17" height="17"></i></div>
+      </div>
+      <div class="hero-line">
+        <h1>وين رح ناخدك اليوم؟</h1>
+        <p>خطط رحلتك بذكاء… من أول فكرة لحد آخر تفصيلة</p>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Smart Planner filter -->
+      <div class="filter-card">
+        <div class="section-title" style="margin-top:0">
+          <h2><i data-lucide="sparkles" width="15" height="15" style="vertical-align:-2px;color:var(--turquoise)"></i>
+            المساعد الذكي</h2>
+          <span class="link">فلتر جديد</span>
+        </div>
+        <div class="filter-row">
+          <div class="chip active"><i data-lucide="waves"></i>بحرية</div>
+          <div class="chip"><i data-lucide="mountain-snow"></i>جبلية</div>
+          <div class="chip"><i data-lucide="briefcase"></i>عمل</div>
+          <div class="chip"><i data-lucide="landmark"></i>ثقافية</div>
+        </div>
+        <div class="budget-track"><div class="budget-fill"></div></div>
+        <div class="budget-labels"><span>اقتصادي</span><span>الميزانية</span><span>فاخر</span></div>
+        <button class="cta-btn"><i data-lucide="wand-2" width="17" height="17"></i>اقترح لي وجهة</button>
+      </div>
+
+      <!-- Suggested destinations -->
+      <div class="section-title">
+        <h2>وجهات تناسبك</h2>
+        <span class="link">عرض الكل</span>
+      </div>
+      <div class="dest-scroll">
+        <div class="dest-card">
+          <div class="dest-img">
+            <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
+            <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 5س 20د</span>
+          </div>
+          <div class="dest-body">
+            <h3>أوشوايا، الأرجنتين</h3>
+            <p>بوابة أنتاركتيكا</p>
+            <div class="dest-tags"><span class="tag">مغامرات</span><span class="tag">بحري</span></div>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#2FBFB0,#0A3D52)">
+            <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
+            <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 3س 40د</span>
+          </div>
+          <div class="dest-body">
+            <h3>إسطنبول، تركيا</h3>
+            <p>ثقافة + مطاعم حلال</p>
+            <div class="dest-tags"><span class="tag">ثقافية</span><span class="tag">حلال</span></div>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#136E8C,#0A3D52)">
+            <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
+            <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 2س 10د</span>
+          </div>
+          <div class="dest-body">
+            <h3>مسقط، عُمان</h3>
+            <p>شواطئ + طابع محلي</p>
+            <div class="dest-tags"><span class="tag">بحري</span><span class="tag">هادئ</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode dashboard -->
+      <div class="section-title"><h2>لوحة رحلتك</h2></div>
+      <div class="mode-tabs">
+        <div class="mode-tab active">سياحة</div>
+        <div class="mode-tab">عمل</div>
+        <div class="mode-tab">ثقافة / تعليم</div>
+      </div>
+
+      <div style="margin-top:14px">
+        <div class="list-item">
+          <div class="list-icon"><i data-lucide="ferris-wheel" width="19" height="19"></i></div>
+          <div class="list-text"><h4>معالم ترفيهية قريبة</h4><span>4 أماكن مقترحة اليوم</span></div>
+          <div class="list-meta"><b>2.3 كم</b><small>الأقرب</small></div>
+        </div>
+        <div class="list-item">
+          <div class="list-icon coral"><i data-lucide="ship" width="19" height="19"></i></div>
+          <div class="list-text"><h4>Viva Expeditions</h4><span>جولات بحرية معتمدة</span></div>
+          <div class="list-meta"><b>4.8</b><small>تقييم موثّق</small></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= DESTINATION DETAIL ================= -->
+  <div class="screen" id="screen-detail">
+    <div class="wave-header" style="border-radius:0 0 30% 30%/0 0 30px 30px; padding-bottom:56px;">
+      <div class="top-row">
+        <div class="icon-btn"><i data-lucide="arrow-right" width="17" height="17"></i></div>
+        <div class="brand-name">أوشوايا، الأرجنتين</div>
+        <div class="icon-btn"><i data-lucide="heart" width="17" height="17"></i></div>
+      </div>
+      <div class="hero-line">
+        <h1>بوابتك إلى أنتاركتيكا</h1>
+        <p>اللغة: إسبانية · العملة: بيزو أرجنتيني · GMT-3</p>
+      </div>
+    </div>
+    <div class="content">
+      <div class="mode-tabs">
+        <div class="mode-tab active">اللوجستيات</div>
+        <div class="mode-tab">الأنشطة</div>
+        <div class="mode-tab">الشركات</div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="list-item">
+          <div class="list-icon"><i data-lucide="train-front" width="19" height="19"></i></div>
+          <div class="list-text"><h4>القطار المحلي</h4><span>يربط المرفأ بالمعالم الرئيسية</span></div>
+        </div>
+        <div class="list-item">
+          <div class="list-icon"><i data-lucide="car-taxi-front" width="19" height="19"></i></div>
+          <div class="list-text"><h4>تاكسي وسيارات مؤجرة</h4><span>متوفر على مدار الساعة</span></div>
+        </div>
+        <div class="list-item">
+          <div class="list-icon coral"><i data-lucide="anchor" width="19" height="19"></i></div>
+          <div class="list-text"><h4>عبّارات إلى أنتاركتيكا</h4><span>رحلات موسمية من المرفأ</span></div>
+        </div>
+      </div>
+
+      <div class="divider-label">شركات موصى بها</div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="ship" width="19" height="19"></i></div>
+        <div class="list-text"><h4>Polar Latitude</h4><span>رحلات قطبية + أنشطة مميزة</span></div>
+        <div class="list-meta"><b>معتمدة</b><small>وكالة رسمية</small></div>
+      </div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="compass" width="19" height="19"></i></div>
+        <div class="list-text"><h4>Viva Expeditions</h4><span>جداول سياحية شاملة</span></div>
+        <div class="list-meta"><b>معتمدة</b><small>وكالة وسيطة</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SEARCH ================= -->
+  <div class="screen" id="screen-search">
+    <div class="wave-header" style="padding-bottom:30px; border-radius:0 0 24% 24%/0 0 26px 26px;">
+      <div class="top-row">
+        <div class="brand-name">البحث الذكي</div>
+        <div class="icon-btn"><i data-lucide="sliders-horizontal" width="17" height="17"></i></div>
+      </div>
+    </div>
+    <div class="content" style="margin-top:-18px">
+      <div class="search-bar">
+        <i data-lucide="search" width="17" height="17"></i>
+        <input type="text" value="أفضل مطعم حلال في شارع الشانزليزيه" readonly>
+      </div>
+      <div style="border-radius:20px; overflow:hidden; height:150px; background:linear-gradient(135deg,var(--seafoam),var(--sand-deep)); position:relative; margin-bottom:14px; display:flex; align-items:center; justify-content:center;">
+        <i data-lucide="map" width="30" height="30" style="color:var(--ocean); opacity:.5"></i>
+        <div style="position:absolute; bottom:10px; right:10px; background:#fff; padding:6px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--ocean); display:flex; align-items:center; gap:5px;">
+          <i data-lucide="navigation" width="12" height="12"></i> 850م — عرض الخريطة
+        </div>
+      </div>
+      <div class="section-title" style="margin-top:0"><h2>3 نتائج مطابقة</h2></div>
+      <div class="list-item">
+        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
+        <div class="list-text"><h4>مطعم الشام</h4><span>حلال · مطبخ شامي</span></div>
+        <div class="list-meta"><b>4.7★</b><small>320م</small></div>
+      </div>
+      <div class="list-item">
+        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
+        <div class="list-text"><h4>Le Bosphore</h4><span>حلال · مأكولات بحرية</span></div>
+        <div class="list-meta"><b>4.5★</b><small>600م</small></div>
+      </div>
+      <div class="list-item">
+        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
+        <div class="list-text"><h4>Anatolia Grill</h4><span>حلال · شواء</span></div>
+        <div class="list-meta"><b>4.4★</b><small>850م</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MUSLIM CORNER ================= -->
+  <div class="screen" id="screen-muslim">
+    <div class="wave-header" style="padding-bottom:30px; border-radius:0 0 24% 24%/0 0 26px 26px;">
+      <div class="top-row">
+        <div class="brand-name">ركن المسافر المسلم</div>
+        <div class="icon-btn"><i data-lucide="map-pin" width="17" height="17"></i></div>
+      </div>
+    </div>
+    <div class="content" style="margin-top:-18px">
+      <div class="prayer-strip">
+        <div class="list-icon" style="background:rgba(255,255,255,.16); color:#fff;">
+          <i data-lucide="moon-star" width="19" height="19"></i>
+        </div>
+        <div class="next">
+          <span>الصلاة القادمة — العصر</span>
+          <b>03:47 م</b>
+          <div class="prayer-mini">
+            <span>الظهر 12:15</span><span>المغرب 06:52</span><span>العشاء 08:20</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:6px"><h2>أقرب المساجد</h2></div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
+        <div class="list-text"><h4>مسجد الفتح</h4><span>يفتح لجميع الصلوات</span></div>
+        <div class="list-meta"><b>310م</b><small>سيرًا 4 د</small></div>
+      </div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
+        <div class="list-text"><h4>مصلى المطار</h4><span>الطابق الثالث — بوابة 12</span></div>
+        <div class="list-meta"><b>1.1كم</b><small>سيرًا 12 د</small></div>
+      </div>
+
+      <div class="section-title"><h2>سوبر ماركت وأسواق حلال</h2></div>
+      <div class="list-item">
+        <div class="list-icon coral"><i data-lucide="shopping-basket" width="19" height="19"></i></div>
+        <div class="list-text"><h4>Halal Market Express</h4><span>لحوم وذبائح حلال موثقة</span></div>
+        <div class="list-meta"><b>4.6★</b><small>500م</small></div>
+      </div>
+
+      <div class="section-title"><h2>أماكن العبادة الأخرى</h2></div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="church" width="19" height="19"></i></div>
+        <div class="list-text"><h4>كاتدرائية القديس يوسف</h4><span>مواعيد القداس: 9ص، 6م</span></div>
+        <div class="list-meta"><b>900م</b><small>سيرًا 10 د</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TRIP / FAVORITES ================= -->
+  <div class="screen" id="screen-trip">
+    <div class="wave-header" style="padding-bottom:30px; border-radius:0 0 24% 24%/0 0 26px 26px;">
+      <div class="top-row">
+        <div class="brand-name">قائمة رحلتي</div>
+        <div class="icon-btn"><i data-lucide="download-cloud" width="17" height="17"></i></div>
+      </div>
+      <p style="position:relative;z-index:2;color:var(--seafoam);font-size:11.5px;margin-top:10px;">
+        <i data-lucide="wifi-off" width="12" height="12" style="vertical-align:-2px"></i>
+        متاحة بدون إنترنت — خرائط محفوظة
+      </p>
+    </div>
+    <div class="content" style="margin-top:-18px">
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
+        <div class="list-text"><h4>مسجد الفتح</h4><span>محفوظ للاستخدام دون إنترنت</span></div>
+        <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
+      </div>
+      <div class="list-item">
+        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
+        <div class="list-text"><h4>مطعم الشام</h4><span>محفوظ للاستخدام دون إنترنت</span></div>
+        <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
+      </div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="ship" width="19" height="19"></i></div>
+        <div class="list-text"><h4>Polar Latitude</h4><span>جولة أنتاركتيكا — 12 يناير</span></div>
+        <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
+      </div>
+
+      <div class="divider-label">مجتمع الدردشة</div>
+      <div class="list-item">
+        <div class="list-icon"><i data-lucide="message-circle" width="19" height="19"></i></div>
+        <div class="list-text"><h4>غرفة الأرجنتين 🇦🇷</h4><span>214 مسافر نشط الآن</span></div>
+        <div class="list-meta"><b>12</b><small>رسالة جديدة</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= BOTTOM NAV ================= -->
+  <div class="bottom-nav">
+    <div class="nav-item active" data-screen="screen-home"><span class="nav-dot"></span><i data-lucide="compass" width="20" height="20"></i>الرئيسية</div>
+    <div class="nav-item" data-screen="screen-search"><span class="nav-dot"></span><i data-lucide="search" width="20" height="20"></i>البحث</div>
+    <div class="nav-item" data-screen="screen-muslim"><span class="nav-dot"></span><i data-lucide="moon-star" width="20" height="20"></i>ركن المسلم</div>
+    <div class="nav-item" data-screen="screen-trip"><span class="nav-dot"></span><i data-lucide="bookmark" width="20" height="20"></i>رحلتي</div>
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById(item.dataset.screen).classList.add('active');
+      window.scrollTo(0,0);
+    });
+  });
+
+  // Tap a destination card to open its detail screen
+  document.querySelectorAll('.dest-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      document.getElementById('screen-detail').classList.add('active');
+      window.scrollTo(0,0);
+    });
+  });
+
+  // Generic tab toggles (mode-tabs)
+  document.querySelectorAll('.mode-tabs').forEach(group=>{
+    group.querySelectorAll('.mode-tab').forEach(tab=>{
+      tab.addEventListener('click', ()=>{
+        group.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+        tab.classList.add('active');
+      });
+    });
+  });
+
+  document.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      chip.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
