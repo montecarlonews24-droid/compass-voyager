@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>بوصلة المسافر | Compass Voyager</title>
+<title id="pageTitle">بوصلة المسافر | Compass Voyager</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
   :root{
-    --deep-navy:#0A3D52;
-    --ocean:#136E8C;
-    --turquoise:#2FBFB0;
-    --seafoam:#CFEFE7;
-    --sand:#F6EDDD;
-    --sand-deep:#EADFC6;
-    --coral:#FF7A5C;
+    --deep-navy:#003580;
+    --ocean:#0071C2;
+    --turquoise:#FEBB02;
+    --seafoam:#E4F0FB;
+    --sand:#F5F5F7;
+    --sand-deep:#E7EBF0;
+    --coral:#EB2026;
     --foam:#FFFFFF;
-    --ink:#0E3A44;
-    --ink-soft:#4C7480;
+    --ink:#1A1A1A;
+    --ink-soft:#6B6B6B;
     --radius-lg:26px;
     --radius-md:18px;
   }
@@ -77,6 +77,17 @@
     display:flex;align-items:center;justify-content:center;
     color:var(--foam);
   }
+  .top-actions{display:flex; align-items:center; gap:8px; position:relative; z-index:2;}
+  .lang-btn{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.32);
+    color:var(--foam); border-radius:20px;
+    padding:0 12px; height:38px;
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:11.5px;
+    cursor:pointer;
+  }
+  .lang-btn-label{letter-spacing:.3px;}
   .hero-line{position:relative; z-index:2; margin-top:20px;}
   .hero-line h1{font-size:22px; font-weight:800; margin:0 0 4px;}
   .hero-line p{font-size:12.5px; color:var(--seafoam); margin:0; opacity:.9;}
@@ -107,9 +118,9 @@
     display:flex; flex-direction:column; align-items:center; gap:6px;
   }
   .chip.active{
-    background:linear-gradient(135deg,var(--turquoise),var(--ocean));
+    background:linear-gradient(135deg,var(--ocean),var(--deep-navy));
     color:#fff; border-color:transparent;
-    box-shadow:0 8px 16px -8px rgba(19,110,140,.6);
+    box-shadow:0 8px 16px -8px rgba(0,53,128,.5);
   }
   .chip svg{width:18px;height:18px;}
   .budget-track{
@@ -140,7 +151,7 @@
   }
   .dest-img{
     height:100px; width:100%;
-    background:linear-gradient(135deg,var(--turquoise),var(--deep-navy));
+    background:linear-gradient(135deg,var(--ocean),var(--deep-navy));
     position:relative; display:flex; align-items:flex-end; padding:8px;
   }
   .dest-img .fly-badge{
@@ -172,7 +183,7 @@
     display:flex;align-items:center;justify-content:center;
     background:var(--seafoam); color:var(--ocean);
   }
-  .list-icon.coral{background:#FFE7E0; color:var(--coral);}
+  .list-icon.coral{background:#FBE7E7; color:var(--coral);}
   .list-text h4{font-size:13px; margin:0 0 2px; color:var(--ink);}
   .list-text span{font-size:10.5px; color:var(--ink-soft);}
   .list-meta{margin-inline-start:auto; text-align:end;}
@@ -233,7 +244,7 @@
   .screen.active{display:block;}
 
   .fav-toggle{
-    position:absolute; top:8px; right:8px;
+    position:absolute; top:8px; inset-inline-end:8px;
     width:28px;height:28px;border-radius:10px;
     background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center;
     color:var(--coral);
@@ -255,15 +266,18 @@
         <div class="brand">
           <div class="brand-badge"><i data-lucide="compass" width="20" height="20"></i></div>
           <div>
-            <div class="brand-name">بوصلة المسافر</div>
+            <div class="brand-name" data-en="Compass Voyager">بوصلة المسافر</div>
             <div class="brand-sub">Compass Voyager</div>
           </div>
         </div>
-        <div class="icon-btn"><i data-lucide="moon" width="17" height="17"></i></div>
+        <div class="top-actions">
+          <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn"><i data-lucide="moon" width="17" height="17"></i></div>
+        </div>
       </div>
       <div class="hero-line">
-        <h1>وين رح ناخدك اليوم؟</h1>
-        <p>خطط رحلتك بذكاء… من أول فكرة لحد آخر تفصيلة</p>
+        <h1 data-en="Where to today?">وين رح ناخدك اليوم؟</h1>
+        <p data-en="Plan smarter — from the first idea to the last detail">خطط رحلتك بذكاء… من أول فكرة لحد آخر تفصيلة</p>
       </div>
     </div>
 
@@ -273,79 +287,79 @@
       <div class="filter-card">
         <div class="section-title" style="margin-top:0">
           <h2><i data-lucide="sparkles" width="15" height="15" style="vertical-align:-2px;color:var(--turquoise)"></i>
-            المساعد الذكي</h2>
-          <span class="link">فلتر جديد</span>
+            <span data-en="Smart Planner">المساعد الذكي</span></h2>
+          <span class="link" data-en="New filter">فلتر جديد</span>
         </div>
         <div class="filter-row">
-          <div class="chip active"><i data-lucide="waves"></i>بحرية</div>
-          <div class="chip"><i data-lucide="mountain-snow"></i>جبلية</div>
-          <div class="chip"><i data-lucide="briefcase"></i>عمل</div>
-          <div class="chip"><i data-lucide="landmark"></i>ثقافية</div>
+          <div class="chip active"><i data-lucide="waves"></i><span data-en="Beach">بحرية</span></div>
+          <div class="chip"><i data-lucide="mountain-snow"></i><span data-en="Mountain">جبلية</span></div>
+          <div class="chip"><i data-lucide="briefcase"></i><span data-en="Business">عمل</span></div>
+          <div class="chip"><i data-lucide="landmark"></i><span data-en="Culture">ثقافية</span></div>
         </div>
         <div class="budget-track"><div class="budget-fill"></div></div>
-        <div class="budget-labels"><span>اقتصادي</span><span>الميزانية</span><span>فاخر</span></div>
-        <button class="cta-btn"><i data-lucide="wand-2" width="17" height="17"></i>اقترح لي وجهة</button>
+        <div class="budget-labels"><span data-en="Economy">اقتصادي</span><span data-en="Budget">الميزانية</span><span data-en="Luxury">فاخر</span></div>
+        <button class="cta-btn"><i data-lucide="wand-2" width="17" height="17"></i><span data-en="Suggest a destination">اقترح لي وجهة</span></button>
       </div>
 
       <!-- Suggested destinations -->
       <div class="section-title">
-        <h2>وجهات تناسبك</h2>
-        <span class="link">عرض الكل</span>
+        <h2 data-en="Destinations for you">وجهات تناسبك</h2>
+        <span class="link" data-en="See all">عرض الكل</span>
       </div>
       <div class="dest-scroll">
         <div class="dest-card">
-          <div class="dest-img">
+          <div class="dest-img" style="background:linear-gradient(135deg,#0071C2,#003580)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
             <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 5س 20د</span>
           </div>
           <div class="dest-body">
-            <h3>أوشوايا، الأرجنتين</h3>
-            <p>بوابة أنتاركتيكا</p>
-            <div class="dest-tags"><span class="tag">مغامرات</span><span class="tag">بحري</span></div>
+            <h3 data-en="Ushuaia, Argentina">أوشوايا، الأرجنتين</h3>
+            <p data-en="Gateway to Antarctica">بوابة أنتاركتيكا</p>
+            <div class="dest-tags"><span class="tag" data-en="Adventure">مغامرات</span><span class="tag" data-en="Coastal">بحري</span></div>
           </div>
         </div>
         <div class="dest-card">
-          <div class="dest-img" style="background:linear-gradient(135deg,#2FBFB0,#0A3D52)">
+          <div class="dest-img" style="background:linear-gradient(135deg,#0090D9,#003580)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
             <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 3س 40د</span>
           </div>
           <div class="dest-body">
-            <h3>إسطنبول، تركيا</h3>
-            <p>ثقافة + مطاعم حلال</p>
-            <div class="dest-tags"><span class="tag">ثقافية</span><span class="tag">حلال</span></div>
+            <h3 data-en="Istanbul, Turkey">إسطنبول، تركيا</h3>
+            <p data-en="Culture + halal dining">ثقافة + مطاعم حلال</p>
+            <div class="dest-tags"><span class="tag" data-en="Culture">ثقافية</span><span class="tag" data-en="Halal">حلال</span></div>
           </div>
         </div>
         <div class="dest-card">
-          <div class="dest-img" style="background:linear-gradient(135deg,#136E8C,#0A3D52)">
+          <div class="dest-img" style="background:linear-gradient(135deg,#003580,#001B40)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
             <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 2س 10د</span>
           </div>
           <div class="dest-body">
-            <h3>مسقط، عُمان</h3>
-            <p>شواطئ + طابع محلي</p>
-            <div class="dest-tags"><span class="tag">بحري</span><span class="tag">هادئ</span></div>
+            <h3 data-en="Muscat, Oman">مسقط، عُمان</h3>
+            <p data-en="Beaches + local charm">شواطئ + طابع محلي</p>
+            <div class="dest-tags"><span class="tag" data-en="Coastal">بحري</span><span class="tag" data-en="Relaxed">هادئ</span></div>
           </div>
         </div>
       </div>
 
       <!-- Mode dashboard -->
-      <div class="section-title"><h2>لوحة رحلتك</h2></div>
+      <div class="section-title"><h2 data-en="Your trip dashboard">لوحة رحلتك</h2></div>
       <div class="mode-tabs">
-        <div class="mode-tab active">سياحة</div>
-        <div class="mode-tab">عمل</div>
-        <div class="mode-tab">ثقافة / تعليم</div>
+        <div class="mode-tab active" data-en="Leisure">سياحة</div>
+        <div class="mode-tab" data-en="Business">عمل</div>
+        <div class="mode-tab" data-en="Culture / Study">ثقافة / تعليم</div>
       </div>
 
       <div style="margin-top:14px">
         <div class="list-item">
           <div class="list-icon"><i data-lucide="ferris-wheel" width="19" height="19"></i></div>
-          <div class="list-text"><h4>معالم ترفيهية قريبة</h4><span>4 أماكن مقترحة اليوم</span></div>
-          <div class="list-meta"><b>2.3 كم</b><small>الأقرب</small></div>
+          <div class="list-text"><h4 data-en="Nearby attractions">معالم ترفيهية قريبة</h4><span data-en="4 places suggested today">4 أماكن مقترحة اليوم</span></div>
+          <div class="list-meta"><b data-en="2.3 km">2.3 كم</b><small data-en="Closest">الأقرب</small></div>
         </div>
         <div class="list-item">
           <div class="list-icon coral"><i data-lucide="ship" width="19" height="19"></i></div>
-          <div class="list-text"><h4>Viva Expeditions</h4><span>جولات بحرية معتمدة</span></div>
-          <div class="list-meta"><b>4.8</b><small>تقييم موثّق</small></div>
+          <div class="list-text"><h4>Viva Expeditions</h4><span data-en="Certified sea tours">جولات بحرية معتمدة</span></div>
+          <div class="list-meta"><b>4.8</b><small data-en="Verified rating">تقييم موثّق</small></div>
         </div>
       </div>
 
@@ -357,45 +371,48 @@
     <div class="wave-header" style="border-radius:0 0 30% 30%/0 0 30px 30px; padding-bottom:56px;">
       <div class="top-row">
         <div class="icon-btn"><i data-lucide="arrow-right" width="17" height="17"></i></div>
-        <div class="brand-name">أوشوايا، الأرجنتين</div>
-        <div class="icon-btn"><i data-lucide="heart" width="17" height="17"></i></div>
+        <div class="brand-name" data-en="Ushuaia, Argentina">أوشوايا، الأرجنتين</div>
+        <div class="top-actions">
+          <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn"><i data-lucide="heart" width="17" height="17"></i></div>
+        </div>
       </div>
       <div class="hero-line">
-        <h1>بوابتك إلى أنتاركتيكا</h1>
-        <p>اللغة: إسبانية · العملة: بيزو أرجنتيني · GMT-3</p>
+        <h1 data-en="Your gateway to Antarctica">بوابتك إلى أنتاركتيكا</h1>
+        <p data-en="Language: Spanish · Currency: Argentine Peso · GMT-3">اللغة: إسبانية · العملة: بيزو أرجنتيني · GMT-3</p>
       </div>
     </div>
     <div class="content">
       <div class="mode-tabs">
-        <div class="mode-tab active">اللوجستيات</div>
-        <div class="mode-tab">الأنشطة</div>
-        <div class="mode-tab">الشركات</div>
+        <div class="mode-tab active" data-en="Logistics">اللوجستيات</div>
+        <div class="mode-tab" data-en="Activities">الأنشطة</div>
+        <div class="mode-tab" data-en="Companies">الشركات</div>
       </div>
       <div style="margin-top:14px">
         <div class="list-item">
           <div class="list-icon"><i data-lucide="train-front" width="19" height="19"></i></div>
-          <div class="list-text"><h4>القطار المحلي</h4><span>يربط المرفأ بالمعالم الرئيسية</span></div>
+          <div class="list-text"><h4 data-en="Local train">القطار المحلي</h4><span data-en="Connects the port to major sites">يربط المرفأ بالمعالم الرئيسية</span></div>
         </div>
         <div class="list-item">
           <div class="list-icon"><i data-lucide="car-taxi-front" width="19" height="19"></i></div>
-          <div class="list-text"><h4>تاكسي وسيارات مؤجرة</h4><span>متوفر على مدار الساعة</span></div>
+          <div class="list-text"><h4 data-en="Taxis &amp; car rentals">تاكسي وسيارات مؤجرة</h4><span data-en="Available 24/7">متوفر على مدار الساعة</span></div>
         </div>
         <div class="list-item">
           <div class="list-icon coral"><i data-lucide="anchor" width="19" height="19"></i></div>
-          <div class="list-text"><h4>عبّارات إلى أنتاركتيكا</h4><span>رحلات موسمية من المرفأ</span></div>
+          <div class="list-text"><h4 data-en="Ferries to Antarctica">عبّارات إلى أنتاركتيكا</h4><span data-en="Seasonal departures from the port">رحلات موسمية من المرفأ</span></div>
         </div>
       </div>
 
-      <div class="divider-label">شركات موصى بها</div>
+      <div class="divider-label" data-en="Recommended operators">شركات موصى بها</div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="ship" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Polar Latitude</h4><span>رحلات قطبية + أنشطة مميزة</span></div>
-        <div class="list-meta"><b>معتمدة</b><small>وكالة رسمية</small></div>
+        <div class="list-text"><h4>Polar Latitude</h4><span data-en="Polar expeditions + signature activities">رحلات قطبية + أنشطة مميزة</span></div>
+        <div class="list-meta"><b data-en="Certified">معتمدة</b><small data-en="Official agency">وكالة رسمية</small></div>
       </div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="compass" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Viva Expeditions</h4><span>جداول سياحية شاملة</span></div>
-        <div class="list-meta"><b>معتمدة</b><small>وكالة وسيطة</small></div>
+        <div class="list-text"><h4>Viva Expeditions</h4><span data-en="Full itinerary planning">جداول سياحية شاملة</span></div>
+        <div class="list-meta"><b data-en="Certified">معتمدة</b><small data-en="Partner agency">وكالة وسيطة</small></div>
       </div>
     </div>
   </div>
@@ -404,36 +421,39 @@
   <div class="screen" id="screen-search">
     <div class="wave-header" style="padding-bottom:30px; border-radius:0 0 24% 24%/0 0 26px 26px;">
       <div class="top-row">
-        <div class="brand-name">البحث الذكي</div>
-        <div class="icon-btn"><i data-lucide="sliders-horizontal" width="17" height="17"></i></div>
+        <div class="brand-name" data-en="Smart Search">البحث الذكي</div>
+        <div class="top-actions">
+          <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn"><i data-lucide="sliders-horizontal" width="17" height="17"></i></div>
+        </div>
       </div>
     </div>
     <div class="content" style="margin-top:-18px">
       <div class="search-bar">
         <i data-lucide="search" width="17" height="17"></i>
-        <input type="text" value="أفضل مطعم حلال في شارع الشانزليزيه" readonly>
+        <input type="text" id="searchInput" value="أفضل مطعم حلال في شارع الشانزليزيه" data-en-value="best halal restaurant on Champs-Élysées" readonly>
       </div>
       <div style="border-radius:20px; overflow:hidden; height:150px; background:linear-gradient(135deg,var(--seafoam),var(--sand-deep)); position:relative; margin-bottom:14px; display:flex; align-items:center; justify-content:center;">
         <i data-lucide="map" width="30" height="30" style="color:var(--ocean); opacity:.5"></i>
-        <div style="position:absolute; bottom:10px; right:10px; background:#fff; padding:6px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--ocean); display:flex; align-items:center; gap:5px;">
-          <i data-lucide="navigation" width="12" height="12"></i> 850م — عرض الخريطة
+        <div style="position:absolute; bottom:10px; inset-inline-end:10px; background:#fff; padding:6px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--ocean); display:flex; align-items:center; gap:5px;">
+          <i data-lucide="navigation" width="12" height="12"></i> <span data-en="850m — view map">850م — عرض الخريطة</span>
         </div>
       </div>
-      <div class="section-title" style="margin-top:0"><h2>3 نتائج مطابقة</h2></div>
+      <div class="section-title" style="margin-top:0"><h2 data-en="3 matching results">3 نتائج مطابقة</h2></div>
       <div class="list-item">
         <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4>مطعم الشام</h4><span>حلال · مطبخ شامي</span></div>
-        <div class="list-meta"><b>4.7★</b><small>320م</small></div>
+        <div class="list-text"><h4 data-en="Al Sham Restaurant">مطعم الشام</h4><span data-en="Halal · Levantine cuisine">حلال · مطبخ شامي</span></div>
+        <div class="list-meta"><b>4.7★</b><small data-en="320m">320م</small></div>
       </div>
       <div class="list-item">
         <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Le Bosphore</h4><span>حلال · مأكولات بحرية</span></div>
-        <div class="list-meta"><b>4.5★</b><small>600م</small></div>
+        <div class="list-text"><h4>Le Bosphore</h4><span data-en="Halal · Seafood">حلال · مأكولات بحرية</span></div>
+        <div class="list-meta"><b>4.5★</b><small data-en="600m">600م</small></div>
       </div>
       <div class="list-item">
         <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Anatolia Grill</h4><span>حلال · شواء</span></div>
-        <div class="list-meta"><b>4.4★</b><small>850م</small></div>
+        <div class="list-text"><h4>Anatolia Grill</h4><span data-en="Halal · Grill">حلال · شواء</span></div>
+        <div class="list-meta"><b>4.4★</b><small data-en="850m">850م</small></div>
       </div>
     </div>
   </div>
@@ -442,8 +462,11 @@
   <div class="screen" id="screen-muslim">
     <div class="wave-header" style="padding-bottom:30px; border-radius:0 0 24% 24%/0 0 26px 26px;">
       <div class="top-row">
-        <div class="brand-name">ركن المسافر المسلم</div>
-        <div class="icon-btn"><i data-lucide="map-pin" width="17" height="17"></i></div>
+        <div class="brand-name" data-en="Muslim Traveler Corner">ركن المسافر المسلم</div>
+        <div class="top-actions">
+          <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn"><i data-lucide="map-pin" width="17" height="17"></i></div>
+        </div>
       </div>
     </div>
     <div class="content" style="margin-top:-18px">
@@ -452,38 +475,38 @@
           <i data-lucide="moon-star" width="19" height="19"></i>
         </div>
         <div class="next">
-          <span>الصلاة القادمة — العصر</span>
-          <b>03:47 م</b>
+          <span data-en="Next prayer — Asr">الصلاة القادمة — العصر</span>
+          <b data-en="3:47 PM">03:47 م</b>
           <div class="prayer-mini">
-            <span>الظهر 12:15</span><span>المغرب 06:52</span><span>العشاء 08:20</span>
+            <span data-en="Dhuhr 12:15">الظهر 12:15</span><span data-en="Maghrib 6:52">المغرب 06:52</span><span data-en="Isha 8:20">العشاء 08:20</span>
           </div>
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:6px"><h2>أقرب المساجد</h2></div>
+      <div class="section-title" style="margin-top:6px"><h2 data-en="Nearest mosques">أقرب المساجد</h2></div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
-        <div class="list-text"><h4>مسجد الفتح</h4><span>يفتح لجميع الصلوات</span></div>
-        <div class="list-meta"><b>310م</b><small>سيرًا 4 د</small></div>
+        <div class="list-text"><h4 data-en="Al-Fath Mosque">مسجد الفتح</h4><span data-en="Open for all prayers">يفتح لجميع الصلوات</span></div>
+        <div class="list-meta"><b data-en="310m">310م</b><small data-en="4 min walk">سيرًا 4 د</small></div>
       </div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
-        <div class="list-text"><h4>مصلى المطار</h4><span>الطابق الثالث — بوابة 12</span></div>
-        <div class="list-meta"><b>1.1كم</b><small>سيرًا 12 د</small></div>
+        <div class="list-text"><h4 data-en="Airport prayer room">مصلى المطار</h4><span data-en="3rd floor — Gate 12">الطابق الثالث — بوابة 12</span></div>
+        <div class="list-meta"><b data-en="1.1km">1.1كم</b><small data-en="12 min walk">سيرًا 12 د</small></div>
       </div>
 
-      <div class="section-title"><h2>سوبر ماركت وأسواق حلال</h2></div>
+      <div class="section-title"><h2 data-en="Halal markets &amp; groceries">سوبر ماركت وأسواق حلال</h2></div>
       <div class="list-item">
         <div class="list-icon coral"><i data-lucide="shopping-basket" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Halal Market Express</h4><span>لحوم وذبائح حلال موثقة</span></div>
-        <div class="list-meta"><b>4.6★</b><small>500م</small></div>
+        <div class="list-text"><h4>Halal Market Express</h4><span data-en="Certified halal meat &amp; goods">لحوم وذبائح حلال موثقة</span></div>
+        <div class="list-meta"><b>4.6★</b><small data-en="500m">500م</small></div>
       </div>
 
-      <div class="section-title"><h2>أماكن العبادة الأخرى</h2></div>
+      <div class="section-title"><h2 data-en="Other places of worship">أماكن العبادة الأخرى</h2></div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="church" width="19" height="19"></i></div>
-        <div class="list-text"><h4>كاتدرائية القديس يوسف</h4><span>مواعيد القداس: 9ص، 6م</span></div>
-        <div class="list-meta"><b>900م</b><small>سيرًا 10 د</small></div>
+        <div class="list-text"><h4 data-en="St. Joseph's Cathedral">كاتدرائية القديس يوسف</h4><span data-en="Mass times: 9 AM, 6 PM">مواعيد القداس: 9ص، 6م</span></div>
+        <div class="list-meta"><b data-en="900m">900م</b><small data-en="10 min walk">سيرًا 10 د</small></div>
       </div>
     </div>
   </div>
@@ -492,52 +515,88 @@
   <div class="screen" id="screen-trip">
     <div class="wave-header" style="padding-bottom:30px; border-radius:0 0 24% 24%/0 0 26px 26px;">
       <div class="top-row">
-        <div class="brand-name">قائمة رحلتي</div>
-        <div class="icon-btn"><i data-lucide="download-cloud" width="17" height="17"></i></div>
+        <div class="brand-name" data-en="My Trip List">قائمة رحلتي</div>
+        <div class="top-actions">
+          <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn"><i data-lucide="download-cloud" width="17" height="17"></i></div>
+        </div>
       </div>
       <p style="position:relative;z-index:2;color:var(--seafoam);font-size:11.5px;margin-top:10px;">
         <i data-lucide="wifi-off" width="12" height="12" style="vertical-align:-2px"></i>
-        متاحة بدون إنترنت — خرائط محفوظة
+        <span data-en="Available offline — maps saved">متاحة بدون إنترنت — خرائط محفوظة</span>
       </p>
     </div>
     <div class="content" style="margin-top:-18px">
       <div class="list-item">
         <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
-        <div class="list-text"><h4>مسجد الفتح</h4><span>محفوظ للاستخدام دون إنترنت</span></div>
+        <div class="list-text"><h4 data-en="Al-Fath Mosque">مسجد الفتح</h4><span data-en="Saved for offline use">محفوظ للاستخدام دون إنترنت</span></div>
         <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
       </div>
       <div class="list-item">
         <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4>مطعم الشام</h4><span>محفوظ للاستخدام دون إنترنت</span></div>
+        <div class="list-text"><h4 data-en="Al Sham Restaurant">مطعم الشام</h4><span data-en="Saved for offline use">محفوظ للاستخدام دون إنترنت</span></div>
         <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
       </div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="ship" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Polar Latitude</h4><span>جولة أنتاركتيكا — 12 يناير</span></div>
+        <div class="list-text"><h4>Polar Latitude</h4><span data-en="Antarctica tour — Jan 12">جولة أنتاركتيكا — 12 يناير</span></div>
         <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
       </div>
 
-      <div class="divider-label">مجتمع الدردشة</div>
+      <div class="divider-label" data-en="Community chat">مجتمع الدردشة</div>
       <div class="list-item">
         <div class="list-icon"><i data-lucide="message-circle" width="19" height="19"></i></div>
-        <div class="list-text"><h4>غرفة الأرجنتين 🇦🇷</h4><span>214 مسافر نشط الآن</span></div>
-        <div class="list-meta"><b>12</b><small>رسالة جديدة</small></div>
+        <div class="list-text"><h4 data-en="Argentina Room 🇦🇷">غرفة الأرجنتين 🇦🇷</h4><span data-en="214 travelers active now">214 مسافر نشط الآن</span></div>
+        <div class="list-meta"><b>12</b><small data-en="new messages">رسالة جديدة</small></div>
       </div>
     </div>
   </div>
 
   <!-- ================= BOTTOM NAV ================= -->
   <div class="bottom-nav">
-    <div class="nav-item active" data-screen="screen-home"><span class="nav-dot"></span><i data-lucide="compass" width="20" height="20"></i>الرئيسية</div>
-    <div class="nav-item" data-screen="screen-search"><span class="nav-dot"></span><i data-lucide="search" width="20" height="20"></i>البحث</div>
-    <div class="nav-item" data-screen="screen-muslim"><span class="nav-dot"></span><i data-lucide="moon-star" width="20" height="20"></i>ركن المسلم</div>
-    <div class="nav-item" data-screen="screen-trip"><span class="nav-dot"></span><i data-lucide="bookmark" width="20" height="20"></i>رحلتي</div>
+    <div class="nav-item active" data-screen="screen-home"><span class="nav-dot"></span><i data-lucide="compass" width="20" height="20"></i><span data-en="Home">الرئيسية</span></div>
+    <div class="nav-item" data-screen="screen-search"><span class="nav-dot"></span><i data-lucide="search" width="20" height="20"></i><span data-en="Search">البحث</span></div>
+    <div class="nav-item" data-screen="screen-muslim"><span class="nav-dot"></span><i data-lucide="moon-star" width="20" height="20"></i><span data-en="Muslim">ركن المسلم</span></div>
+    <div class="nav-item" data-screen="screen-trip"><span class="nav-dot"></span><i data-lucide="bookmark" width="20" height="20"></i><span data-en="Trips">رحلتي</span></div>
   </div>
 
 </div>
 
 <script>
   lucide.createIcons();
+
+  let currentLang = 'ar';
+  const titleEl = document.getElementById('pageTitle');
+  const titleAr = 'بوصلة المسافر | Compass Voyager';
+  const titleEn = 'Compass Voyager | Travel Planner';
+
+  function applyLang(lang){
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      if(el.dataset.arCache === undefined) el.dataset.arCache = el.textContent;
+      el.textContent = lang === 'ar' ? el.dataset.arCache : el.getAttribute('data-en');
+    });
+
+    document.querySelectorAll('[data-en-value]').forEach(el=>{
+      if(el.dataset.arValueCache === undefined) el.dataset.arValueCache = el.value;
+      el.value = lang === 'ar' ? el.dataset.arValueCache : el.getAttribute('data-en-value');
+    });
+
+    document.querySelectorAll('.lang-btn-label').forEach(l=>{
+      l.textContent = lang === 'ar' ? 'EN' : 'AR';
+    });
+
+    if(titleEl) titleEl.textContent = lang === 'ar' ? titleAr : titleEn;
+
+    currentLang = lang;
+  }
+
+  function toggleLang(){
+    applyLang(currentLang === 'ar' ? 'en' : 'ar');
+  }
+  window.toggleLang = toggleLang;
 
   document.querySelectorAll('.nav-item').forEach(item=>{
     item.addEventListener('click', ()=>{
