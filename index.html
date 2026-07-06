@@ -364,6 +364,67 @@
     background:linear-gradient(135deg,var(--deep-navy),var(--ocean)); color:#fff;
     display:flex; align-items:center; justify-content:center; cursor:pointer;
   }
+
+  /* ---------- Verified GPS reviews ---------- */
+  .review-item{
+    background:var(--foam); border-radius:16px; padding:12px 14px;
+    margin-bottom:10px; box-shadow:0 8px 18px -14px rgba(10,61,82,.25);
+  }
+  .review-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .review-avatar{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    background:var(--seafoam); color:var(--ocean);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:12px;
+  }
+  .review-name-row{flex:1; min-width:0;}
+  .review-name{font-size:12.5px; font-weight:800; color:var(--ink); display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .verified-badge{
+    display:inline-flex; align-items:center; gap:3px;
+    background:var(--seafoam); color:var(--ocean);
+    font-size:9px; font-weight:800; padding:2px 7px; border-radius:20px;
+  }
+  .review-stars{color:var(--turquoise); font-size:11px; margin-top:1px; letter-spacing:1px;}
+  .review-text{font-size:12px; color:var(--ink-soft); line-height:1.55; margin-top:4px;}
+
+  .verify-card{
+    background:var(--foam); border-radius:20px; padding:18px;
+    margin-top:4px; box-shadow:0 12px 24px -16px rgba(10,61,82,.3); text-align:center;
+  }
+  .verify-icon{
+    width:46px; height:46px; border-radius:14px;
+    background:var(--seafoam); color:var(--ocean);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 10px;
+  }
+  .verify-title{font-family:'Cairo',sans-serif; font-weight:800; font-size:13.5px; color:var(--ink); margin-bottom:4px;}
+  .verify-sub{font-size:11px; color:var(--ink-soft); margin-bottom:14px; line-height:1.6;}
+  .verify-btn{
+    width:100%; padding:13px; border:none; border-radius:14px;
+    background:linear-gradient(135deg,var(--deep-navy),var(--ocean)); color:#fff;
+    font-family:'Cairo',sans-serif; font-weight:700; font-size:13px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .verify-status{margin-top:12px; font-size:11.5px; font-weight:700; padding:11px; border-radius:12px; line-height:1.6; text-align:start;}
+  .verify-status.success{background:#E4F7ED; color:#1E8A4C;}
+  .verify-status.fail{background:#FBE7E7; color:var(--coral);}
+  .verify-status.loading{background:var(--sand); color:var(--ink-soft); text-align:center;}
+  .review-form{margin-top:14px; text-align:start;}
+  .star-picker{display:flex; gap:8px; margin-bottom:12px; justify-content:center;}
+  .star-picker i{cursor:pointer; color:var(--sand-deep); pointer-events:auto;}
+  .star-picker i.selected{color:var(--turquoise);}
+  .review-textarea{
+    width:100%; border:1px solid var(--sand-deep); border-radius:12px;
+    padding:10px 12px; font-family:'Tajawal',sans-serif; font-size:12.5px;
+    resize:none; min-height:64px; background:var(--sand); color:var(--ink);
+    box-sizing:border-box;
+  }
+  .submit-review-btn{
+    margin-top:10px; width:100%; padding:12px; border:none; border-radius:14px;
+    background:var(--turquoise); color:var(--deep-navy);
+    font-family:'Cairo',sans-serif; font-weight:800; font-size:13px; cursor:pointer;
+  }
+  .spin{animation:spin 1s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -525,6 +586,10 @@
         <div class="list-text"><h4>Viva Expeditions</h4><span data-en="Full itinerary planning">جداول سياحية شاملة</span></div>
         <div class="list-meta"><b data-en="Certified">معتمدة</b><small data-en="Partner agency">وكالة وسيطة</small></div>
       </div>
+
+      <div class="divider-label" data-en="Verified reviews">تقييمات موثقة</div>
+      <div id="reviewsList"></div>
+      <div class="verify-card" id="verifyCard"></div>
     </div>
   </div>
 
@@ -754,6 +819,11 @@
       renderChatRoom(currentRoom, false);
     }
 
+    if(document.getElementById('reviewsList') && typeof renderReviews === 'function'){
+      renderReviews();
+      if(verifyState === 'idle') renderVerifyCard('idle');
+    }
+
     document.querySelectorAll('.lang-btn-label').forEach(l=>{
       l.textContent = lang === 'ar' ? 'EN' : 'AR';
     });
@@ -924,6 +994,153 @@
   document.getElementById('chatInput').addEventListener('keydown', (e)=>{
     if(e.key === 'Enter'){ sendChatMessage(); }
   });
+
+  // ---------- Verified GPS reviews (Ushuaia destination) ----------
+  const DEST_COORDS = {lat:-54.8019, lon:-68.3029}; // Ushuaia, Argentina
+  const VERIFY_RADIUS_KM = 25;
+
+  const reviews = [
+    {name:'كريم', nameEn:'Kareem', initial:'ك', rating:5,
+      text:'الجو صعب بس المنظر ما إله مثيل، رحلة العمر فعلاً.',
+      textEn:'Weather is tough but the view has no equal — trip of a lifetime.'},
+    {name:'هبة', nameEn:'Heba', initial:'هـ', rating:4,
+      text:'المرفأ منظم كتير والعبّارات لأنتاركتيكا موثوقة.',
+      textEn:'The port is very organized and the ferries to Antarctica are reliable.'},
+    {name:'طارق', nameEn:'Tarek', initial:'ط', rating:5,
+      text:'Polar Latitude فعلاً محترفين، ما ندمت على السعر.',
+      textEn:'Polar Latitude were truly professional — worth every dollar.'},
+  ];
+
+  function stars(n){ return '★★★★★☆☆☆☆☆'.slice(5-n, 10-n); }
+
+  function renderReviews(){
+    const list = document.getElementById('reviewsList');
+    if(!list) return;
+    list.innerHTML = '';
+    reviews.forEach(r=>{
+      const el = document.createElement('div');
+      el.className = 'review-item';
+      el.innerHTML =
+        '<div class="review-head">' +
+          '<div class="review-avatar">'+r.initial+'</div>' +
+          '<div class="review-name-row">' +
+            '<div class="review-name">'+ (currentLang==='ar' ? r.name : r.nameEn) +
+              '<span class="verified-badge"><i data-lucide="badge-check" width="10" height="10"></i>' +
+              (currentLang==='ar' ? 'زيارة موثقة' : 'Verified visit') + '</span></div>' +
+            '<div class="review-stars">'+stars(r.rating)+'</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="review-text">'+ (currentLang==='ar' ? r.text : r.textEn) +'</div>';
+      list.appendChild(el);
+    });
+    lucide.createIcons();
+  }
+
+  function haversineKm(lat1, lon1, lat2, lon2){
+    const R = 6371;
+    const dLat = (lat2-lat1) * Math.PI/180;
+    const dLon = (lon2-lon1) * Math.PI/180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  }
+
+  let pendingRating = 0;
+  let verifyState = 'idle';
+
+  function renderVerifyCard(state, payload){
+    verifyState = state;
+    const card = document.getElementById('verifyCard');
+    const t = (ar, en) => currentLang === 'ar' ? ar : en;
+
+    if(state === 'idle'){
+      card.innerHTML =
+        '<div class="verify-icon"><i data-lucide="shield-check" width="22" height="22"></i></div>' +
+        '<div class="verify-title">'+t('تقييمك ما بيظهر إلا لو زرت المكان فعلاً','Your review only shows if you actually visited')+'</div>' +
+        '<div class="verify-sub">'+t('بنتحقق من موقعك عبر GPS قبل ما نسمح لك تكتب تقييم، عشان التقييمات تضل موثوقة 100%.','We verify your location via GPS before allowing a review, so ratings stay 100% trustworthy.')+'</div>' +
+        '<button class="verify-btn" onclick="requestLocationVerification()"><i data-lucide="map-pin" width="16" height="16"></i>'+t('تحقق من موقعي وأضف تقييم','Verify my location & review')+'</button>';
+    }
+    else if(state === 'loading'){
+      card.innerHTML =
+        '<div class="verify-icon"><i data-lucide="loader-2" width="22" height="22" class="spin"></i></div>' +
+        '<div class="verify-title">'+t('جاري التحقق من موقعك...','Checking your location...')+'</div>' +
+        '<div class="verify-status loading">'+t('برجاء السماح بالوصول لموقعك الجغرافي','Please allow location access')+'</div>';
+    }
+    else if(state === 'success'){
+      card.innerHTML =
+        '<div class="verify-icon"><i data-lucide="badge-check" width="22" height="22"></i></div>' +
+        '<div class="verify-title">'+t('تم التحقق من زيارتك ✓','Your visit is verified ✓')+'</div>' +
+        '<div class="verify-status success">'+t('أنت فعلاً على بعد '+payload.dist+' كم من أوشوايا — تقدر تضيف تقييمك الموثق الآن.','You are '+payload.dist+' km from Ushuaia — you can add your verified review now.')+'</div>' +
+        '<div class="review-form">' +
+          '<div class="star-picker" id="starPicker">' +
+            [1,2,3,4,5].map(n=>'<i data-lucide="star" width="24" height="24" data-star="'+n+'" onclick="setRating('+n+')"></i>').join('') +
+          '</div>' +
+          '<textarea class="review-textarea" id="reviewText" placeholder="'+t('اكتب تجربتك هون...','Share your experience here...')+'"></textarea>' +
+          '<button class="submit-review-btn" onclick="submitReview()">'+t('نشر التقييم الموثق','Post verified review')+'</button>' +
+        '</div>';
+      pendingRating = 0;
+    }
+    else if(state === 'fail'){
+      card.innerHTML =
+        '<div class="verify-icon"><i data-lucide="map-pin-off" width="22" height="22"></i></div>' +
+        '<div class="verify-title">'+t('ما قدرنا نتحقق من زيارتك','We could not verify your visit')+'</div>' +
+        '<div class="verify-status fail">'+payload.msg+'</div>' +
+        '<button class="verify-btn" style="margin-top:12px" onclick="requestLocationVerification()"><i data-lucide="rotate-ccw" width="16" height="16"></i>'+t('حاول مرة ثانية','Try again')+'</button>';
+    }
+    lucide.createIcons();
+  }
+
+  function setRating(n){
+    pendingRating = n;
+    document.querySelectorAll('#starPicker i').forEach(star=>{
+      star.classList.toggle('selected', Number(star.dataset.star) <= n);
+    });
+  }
+  window.setRating = setRating;
+
+  function submitReview(){
+    const textEl = document.getElementById('reviewText');
+    const text = textEl ? textEl.value.trim() : '';
+    if(!pendingRating || !text) return;
+    reviews.unshift({
+      name:'أنت', nameEn:'You', initial:'أ',
+      rating:pendingRating, text:text, textEn:text
+    });
+    renderReviews();
+    renderVerifyCard('idle');
+  }
+  window.submitReview = submitReview;
+
+  function requestLocationVerification(){
+    renderVerifyCard('loading');
+    if(!navigator.geolocation){
+      renderVerifyCard('fail', {msg: currentLang==='ar'
+        ? 'المتصفح لا يدعم تحديد الموقع الجغرافي.'
+        : 'This browser does not support geolocation.'});
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        const dist = Math.round(haversineKm(pos.coords.latitude, pos.coords.longitude, DEST_COORDS.lat, DEST_COORDS.lon));
+        if(dist <= VERIFY_RADIUS_KM){
+          renderVerifyCard('success', {dist});
+        } else {
+          renderVerifyCard('fail', {msg: currentLang==='ar'
+            ? 'أنت حالياً على بعد '+dist+' كم من أوشوايا. لازم تكون فعليًا بالموقع (على بعد أقل من '+VERIFY_RADIUS_KM+' كم) لإضافة تقييم موثّق.'
+            : "You're currently "+dist+' km from Ushuaia. You must be physically within '+VERIFY_RADIUS_KM+' km to add a verified review.'});
+        }
+      },
+      (err)=>{
+        renderVerifyCard('fail', {msg: currentLang==='ar'
+          ? 'تعذّر الوصول لموقعك. فعّل صلاحية الموقع من إعدادات المتصفح أو التطبيق ثم حاول مرة ثانية.'
+          : 'Could not access your location. Enable location permission and try again.'});
+      },
+      {enableHighAccuracy:true, timeout:10000}
+    );
+  }
+  window.requestLocationVerification = requestLocationVerification;
+
+  renderReviews();
+  renderVerifyCard('idle');
 
 </script>
 </body>
