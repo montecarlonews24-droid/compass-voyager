@@ -22,6 +22,19 @@
     --radius-lg:26px;
     --radius-md:18px;
   }
+  :root[data-theme="dark"]{
+    --sand:#0F1720;
+    --sand-deep:#1B2530;
+    --foam:#182029;
+    --ink:#F2F5F7;
+    --ink-soft:#96A3AD;
+  }
+  :root[data-theme="dark"] .section-title h2,
+  :root[data-theme="dark"] .mode-tab.active{
+    color:var(--ocean);
+  }
+  :root[data-theme="dark"] .filter-card{border-color:rgba(255,255,255,.06);}
+  :root[data-theme="dark"] .search-bar input::placeholder{color:var(--ink-soft);}
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
@@ -254,6 +267,59 @@
     display:flex; align-items:center; gap:8px; margin:18px 0 10px; color:var(--ink-soft); font-size:11px; font-weight:700;
   }
   .divider-label::before, .divider-label::after{content:""; flex:1; height:1px; background:var(--sand-deep);}
+
+  /* ---------- Interactive map ---------- */
+  .map-canvas{
+    position:relative; height:190px; border-radius:20px; overflow:hidden;
+    margin-bottom:14px;
+    background:
+      linear-gradient(135deg, var(--seafoam), var(--sand-deep));
+  }
+  .map-grid{
+    position:absolute; inset:0;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(19,110,140,.10) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(90deg, rgba(19,110,140,.10) 0 1px, transparent 1px 34px);
+  }
+  .map-road{
+    position:absolute; background:rgba(255,255,255,.55);
+  }
+  .map-pin{position:absolute;}
+  .poi-pin{
+    width:28px; height:28px; border-radius:50% 50% 50% 0;
+    transform:translate(-50%,-100%) rotate(-45deg);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px -6px rgba(0,0,0,.4);
+    cursor:pointer; border:2px solid #fff;
+  }
+  .poi-pin i{transform:rotate(45deg); color:#fff;}
+  .poi-pin.coral{background:var(--coral);}
+  .poi-pin.ocean{background:var(--ocean);}
+  .poi-pin.gold{background:var(--turquoise);}
+  .user-pin{
+    width:14px; height:14px; border-radius:50%;
+    background:var(--ocean); border:3px solid #fff;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 0 4px rgba(0,113,194,.22);
+  }
+  .user-pin .pulse{
+    position:absolute; inset:-12px; border-radius:50%;
+    border:2px solid var(--ocean); opacity:.6;
+    animation:pulseRing 2.2s ease-out infinite;
+  }
+  @keyframes pulseRing{
+    0%{transform:scale(.5); opacity:.7;}
+    100%{transform:scale(2.1); opacity:0;}
+  }
+  .map-tooltip{
+    position:absolute; bottom:10px; inset-inline-start:10px; inset-inline-end:10px;
+    background:#fff; border-radius:12px; padding:9px 12px;
+    display:none; align-items:center; justify-content:space-between;
+    box-shadow:0 10px 20px -10px rgba(0,0,0,.35);
+    font-size:11px; font-weight:700; color:var(--deep-navy);
+  }
+  .map-tooltip.show{display:flex;}
+  .map-tooltip small{color:var(--ink-soft); font-weight:600; font-size:10px;}
 </style>
 </head>
 <body>
@@ -272,7 +338,7 @@
         </div>
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
-          <div class="icon-btn"><i data-lucide="moon" width="17" height="17"></i></div>
+          <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
         </div>
       </div>
       <div class="hero-line">
@@ -374,6 +440,7 @@
         <div class="brand-name" data-en="Ushuaia, Argentina">أوشوايا، الأرجنتين</div>
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
           <div class="icon-btn"><i data-lucide="heart" width="17" height="17"></i></div>
         </div>
       </div>
@@ -424,6 +491,7 @@
         <div class="brand-name" data-en="Smart Search">البحث الذكي</div>
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
           <div class="icon-btn"><i data-lucide="sliders-horizontal" width="17" height="17"></i></div>
         </div>
       </div>
@@ -433,10 +501,29 @@
         <i data-lucide="search" width="17" height="17"></i>
         <input type="text" id="searchInput" value="أفضل مطعم حلال في شارع الشانزليزيه" data-en-value="best halal restaurant on Champs-Élysées" readonly>
       </div>
-      <div style="border-radius:20px; overflow:hidden; height:150px; background:linear-gradient(135deg,var(--seafoam),var(--sand-deep)); position:relative; margin-bottom:14px; display:flex; align-items:center; justify-content:center;">
-        <i data-lucide="map" width="30" height="30" style="color:var(--ocean); opacity:.5"></i>
-        <div style="position:absolute; bottom:10px; inset-inline-end:10px; background:#fff; padding:6px 10px; border-radius:12px; font-size:10px; font-weight:700; color:var(--ocean); display:flex; align-items:center; gap:5px;">
-          <i data-lucide="navigation" width="12" height="12"></i> <span data-en="850m — view map">850م — عرض الخريطة</span>
+      <div class="map-canvas">
+        <div class="map-grid"></div>
+        <div class="map-road" style="top:38%; left:0; right:0; height:6px;"></div>
+        <div class="map-road" style="top:0; bottom:0; left:55%; width:6px;"></div>
+
+        <div class="map-pin user-pin" style="top:56%; left:50%;"><span class="pulse"></span></div>
+
+        <div class="map-pin poi-pin coral" data-name="مطعم الشام" data-name-en="Al Sham Restaurant" data-dist="320م" data-dist-en="320m" style="top:30%; left:63%;">
+          <i data-lucide="utensils-crossed" width="13" height="13"></i>
+        </div>
+        <div class="map-pin poi-pin coral" data-name="Le Bosphore" data-name-en="Le Bosphore" data-dist="600م" data-dist-en="600m" style="top:70%; left:70%;">
+          <i data-lucide="utensils-crossed" width="13" height="13"></i>
+        </div>
+        <div class="map-pin poi-pin ocean" data-name="مسجد الفتح" data-name-en="Al-Fath Mosque" data-dist="310م" data-dist-en="310m" style="top:66%; left:28%;">
+          <i data-lucide="landmark" width="13" height="13"></i>
+        </div>
+        <div class="map-pin poi-pin gold" data-name="برج إيفل" data-name-en="Eiffel Tower" data-dist="1.2كم" data-dist-en="1.2km" style="top:20%; left:22%;">
+          <i data-lucide="camera" width="13" height="13"></i>
+        </div>
+
+        <div class="map-tooltip" id="mapTooltipSearch">
+          <span class="tooltip-name"></span>
+          <small class="tooltip-dist"></small>
         </div>
       </div>
       <div class="section-title" style="margin-top:0"><h2 data-en="3 matching results">3 نتائج مطابقة</h2></div>
@@ -465,6 +552,7 @@
         <div class="brand-name" data-en="Muslim Traveler Corner">ركن المسافر المسلم</div>
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
           <div class="icon-btn"><i data-lucide="map-pin" width="17" height="17"></i></div>
         </div>
       </div>
@@ -518,6 +606,7 @@
         <div class="brand-name" data-en="My Trip List">قائمة رحلتي</div>
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
+          <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
           <div class="icon-btn"><i data-lucide="download-cloud" width="17" height="17"></i></div>
         </div>
       </div>
@@ -597,6 +686,33 @@
     applyLang(currentLang === 'ar' ? 'en' : 'ar');
   }
   window.toggleLang = toggleLang;
+
+  let currentTheme = 'light';
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-toggle-btn i').forEach(icon=>{
+      icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
+    });
+    lucide.createIcons();
+    currentTheme = theme;
+  }
+  function toggleTheme(){
+    applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+  }
+  window.toggleTheme = toggleTheme;
+
+  // Interactive map pins
+  document.querySelectorAll('.map-pin.poi-pin').forEach(pin=>{
+    pin.addEventListener('click', ()=>{
+      const canvas = pin.closest('.map-canvas');
+      const tooltip = canvas.querySelector('.map-tooltip');
+      const name = currentLang === 'ar' ? pin.dataset.name : pin.dataset.nameEn;
+      const dist = currentLang === 'ar' ? pin.dataset.dist : pin.dataset.distEn;
+      tooltip.querySelector('.tooltip-name').textContent = name;
+      tooltip.querySelector('.tooltip-dist').textContent = dist;
+      tooltip.classList.add('show');
+    });
+  });
 
   document.querySelectorAll('.nav-item').forEach(item=>{
     item.addEventListener('click', ()=>{
