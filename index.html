@@ -251,6 +251,55 @@
     font-size:9px; font-weight:800; color:var(--ocean); background:var(--seafoam);
     padding:2px 8px; border-radius:20px; margin-inline-start:8px;
   }
+  .booking-list-item{cursor:pointer;}
+  .booking-back-row{
+    display:flex; align-items:center; gap:10px; margin:4px 2px 14px;
+  }
+  .booking-back-btn{
+    width:36px; height:36px; border-radius:12px; border:none;
+    background:var(--seafoam); color:var(--ocean);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .booking-dest-name{font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:var(--deep-navy);}
+  .booking-dates-card{
+    background:var(--foam); border-radius:var(--radius-lg); padding:16px;
+    box-shadow:0 14px 30px -14px rgba(10,61,82,.25); margin-bottom:16px;
+  }
+  .booking-date-row{display:flex; gap:10px; margin-bottom:12px;}
+  .date-field{flex:1;}
+  .date-field label{display:block; font-size:10.5px; color:var(--ink-soft); font-weight:700; margin-bottom:5px;}
+  .date-field input[type="date"]{
+    width:100%; border:1.5px solid var(--sand-deep); border-radius:12px;
+    padding:9px 8px; font-family:'Tajawal',sans-serif; font-size:12px; color:var(--ink);
+    background:var(--sand);
+  }
+  .guest-stepper{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--sand); border-radius:12px; padding:10px 12px; margin-bottom:14px;
+  }
+  .guest-stepper-label{font-size:12.5px; font-weight:700; color:var(--ink);}
+  .guest-stepper-controls{display:flex; align-items:center; gap:12px;}
+  .guest-stepper-btn{
+    width:28px; height:28px; border-radius:9px; border:none;
+    background:var(--ocean); color:#fff; font-size:16px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .guest-stepper-value{font-size:14px; font-weight:800; color:var(--deep-navy); min-width:16px; text-align:center;}
+  .hotel-card{
+    background:var(--foam); border-radius:var(--radius-md); overflow:hidden;
+    box-shadow:0 12px 22px -14px rgba(10,61,82,.3); margin-bottom:14px; display:flex;
+  }
+  .hotel-card-img{
+    width:96px; flex-shrink:0; background:linear-gradient(135deg,var(--ocean),var(--deep-navy));
+    background-size:cover; background-position:center;
+    display:flex; align-items:flex-end; padding:6px;
+  }
+  .hotel-card-body{padding:10px 12px; flex:1; min-width:0;}
+  .hotel-card-body h4{font-size:13px; margin:0 0 4px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hotel-card-rating{display:flex; align-items:center; gap:4px; font-size:10.5px; color:var(--ink-soft); margin-bottom:6px;}
+  .hotel-card-rating svg{color:var(--turquoise); width:12px; height:12px;}
+  .hotel-card-price{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:var(--deep-navy);}
+  .hotel-card-price span{font-size:9.5px; color:var(--ink-soft); font-weight:600; margin-inline-start:4px;}
 
   /* Bottom nav */
   .bottom-nav{
@@ -1431,6 +1480,9 @@
   // ---------- Booking Hub (live hotel search via proxy) ----------
   const BOOKING_PROXY = 'https://compass-voyager-api.montecarlo-news24.workers.dev/api/hotels';
   let bookingSearchToken = 0;
+  let bookingDestinations = [];
+  let bookingSelectedDestination = null; // { regionId, name }
+  let bookingAdults = 2;
 
   function bookingIconFor(type){
     if(type === 'AIRPORT') return 'plane';
@@ -1475,11 +1527,12 @@
         return;
       }
 
+      bookingDestinations = results.slice(0, 12);
       const box = document.getElementById('bookingResults');
-      box.innerHTML = results.slice(0, 12).map(r=>{
+      box.innerHTML = bookingDestinations.map((r, i)=>{
         const name = r.regionNames && (r.regionNames.displayName || r.regionNames.fullName) || query;
         const typeLabel = r.type || '';
-        return '<div class="list-item">' +
+        return '<div class="list-item booking-list-item" onclick="selectBookingDestination(' + i + ')">' +
           '<div class="list-icon booking-result-icon"><i data-lucide="' + bookingIconFor(r.type) + '" width="19" height="19"></i></div>' +
           '<div class="list-text"><h4>' + name + '<span class="booking-result-type">' + typeLabel + '</span></h4>' +
           '<span>' + (r.hierarchyInfo && r.hierarchyInfo.country && r.hierarchyInfo.country.name || '') + '</span></div>' +
@@ -1494,6 +1547,178 @@
     }
   }
   window.searchBookingDestinations = searchBookingDestinations;
+
+  function isoDateDaysFromNow(days){
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function selectBookingDestination(index){
+    const r = bookingDestinations[index];
+    if(!r) return;
+    const name = r.regionNames && (r.regionNames.displayName || r.regionNames.fullName) || '';
+    const regionId = r.gaiaId || (r.essId && r.essId.sourceId) || '';
+    bookingSelectedDestination = { regionId, name };
+
+    const titleEl = document.getElementById('bookingResultsTitle');
+    if(titleEl) titleEl.textContent = currentLang === 'ar' ? 'اختر التواريخ' : 'Choose your dates';
+
+    const checkIn = isoDateDaysFromNow(7);
+    const checkOut = isoDateDaysFromNow(10);
+
+    const box = document.getElementById('bookingResults');
+    box.innerHTML =
+      '<div class="booking-back-row">' +
+        '<button class="booking-back-btn" onclick="backToBookingSearch()"><i data-lucide="' + (document.documentElement.dir === 'rtl' ? 'arrow-right' : 'arrow-left') + '" width="17" height="17"></i></button>' +
+        '<div class="booking-dest-name">' + name + '</div>' +
+      '</div>' +
+      '<div class="booking-dates-card">' +
+        '<div class="booking-date-row">' +
+          '<div class="date-field"><label data-en="Check-in">تاريخ الوصول</label><input type="date" id="bookingCheckIn" value="' + checkIn + '"></div>' +
+          '<div class="date-field"><label data-en="Check-out">تاريخ المغادرة</label><input type="date" id="bookingCheckOut" value="' + checkOut + '"></div>' +
+        '</div>' +
+        '<div class="guest-stepper">' +
+          '<span class="guest-stepper-label" data-en="Adults">البالغين</span>' +
+          '<div class="guest-stepper-controls">' +
+            '<button class="guest-stepper-btn" onclick="adjustBookingAdults(-1)">−</button>' +
+            '<span class="guest-stepper-value" id="bookingAdultsValue">' + bookingAdults + '</span>' +
+            '<button class="guest-stepper-btn" onclick="adjustBookingAdults(1)">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<button class="cta-btn" onclick="searchHotelPrices()"><i data-lucide="search" width="17" height="17"></i><span data-en="Search hotels">دور على الفنادق</span></button>' +
+      '</div>';
+    lucide.createIcons();
+    applyLang(currentLang);
+  }
+  window.selectBookingDestination = selectBookingDestination;
+
+  function adjustBookingAdults(delta){
+    bookingAdults = Math.max(1, Math.min(8, bookingAdults + delta));
+    const el = document.getElementById('bookingAdultsValue');
+    if(el) el.textContent = bookingAdults;
+  }
+  window.adjustBookingAdults = adjustBookingAdults;
+
+  function backToBookingSearch(){
+    bookingSelectedDestination = null;
+    const titleEl = document.getElementById('bookingResultsTitle');
+    if(titleEl) titleEl.textContent = currentLang === 'ar' ? 'نتائج البحث' : 'Search results';
+    const box = document.getElementById('bookingResults');
+    box.innerHTML = bookingDestinations.map((r, i)=>{
+      const name = r.regionNames && (r.regionNames.displayName || r.regionNames.fullName) || '';
+      const typeLabel = r.type || '';
+      return '<div class="list-item booking-list-item" onclick="selectBookingDestination(' + i + ')">' +
+        '<div class="list-icon booking-result-icon"><i data-lucide="' + bookingIconFor(r.type) + '" width="19" height="19"></i></div>' +
+        '<div class="list-text"><h4>' + name + '<span class="booking-result-type">' + typeLabel + '</span></h4>' +
+        '<span>' + (r.hierarchyInfo && r.hierarchyInfo.country && r.hierarchyInfo.country.name || '') + '</span></div>' +
+        '</div>';
+    }).join('');
+    lucide.createIcons();
+  }
+  window.backToBookingSearch = backToBookingSearch;
+
+  function extractHotelPrice(p){
+    const formatted = p && p.price && p.price.lead && p.price.lead.formatted;
+    if(formatted) return formatted;
+    const amount = p && p.price && p.price.lead && p.price.lead.amount;
+    if(typeof amount === 'number') return '$' + Math.round(amount);
+    return null;
+  }
+
+  function extractHotelImage(p){
+    return (p && p.propertyImage && p.propertyImage.image && p.propertyImage.image.url) || '';
+  }
+
+  function extractHotelRating(p){
+    const score = p && p.reviews && p.reviews.score;
+    return score ? Number(score).toFixed(1) : null;
+  }
+
+  async function searchHotelPrices(){
+    if(!bookingSelectedDestination || !bookingSelectedDestination.regionId){
+      renderBookingState('error', currentLang === 'ar' ? 'اختر وجهة أولًا' : 'Please pick a destination first');
+      return;
+    }
+    const checkInVal = document.getElementById('bookingCheckIn').value;
+    const checkOutVal = document.getElementById('bookingCheckOut').value;
+    if(!checkInVal || !checkOutVal){
+      renderBookingState('error', currentLang === 'ar' ? 'اختر تاريخ الوصول والمغادرة' : 'Please choose both dates');
+      return;
+    }
+
+    const [ciY, ciM, ciD] = checkInVal.split('-').map(Number);
+    const [coY, coM, coD] = checkOutVal.split('-').map(Number);
+
+    const myToken = ++bookingSearchToken;
+    const titleEl = document.getElementById('bookingResultsTitle');
+    if(titleEl) titleEl.textContent = currentLang === 'ar' ? 'نتائج الفنادق' : 'Hotel results';
+    renderBookingState('loading', currentLang === 'ar' ? 'عم نجيب الأسعار...' : 'Fetching live prices...');
+
+    const payload = {
+      currency: 'USD',
+      eapid: 1,
+      locale: 'en_US',
+      siteId: 300000001,
+      destination: { regionId: String(bookingSelectedDestination.regionId) },
+      checkInDate: { day: ciD, month: ciM, year: ciY },
+      checkOutDate: { day: coD, month: coM, year: coY },
+      rooms: [{ adults: bookingAdults, children: [] }],
+      resultsStartingIndex: 0,
+      resultsSize: 20,
+      sort: 'PRICE_LOW_TO_HIGH',
+    };
+
+    try{
+      const url = BOOKING_PROXY + '?path=properties/v3/list';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if(myToken !== bookingSearchToken) return;
+      if(!res.ok) throw new Error('bad-response');
+      const data = await res.json();
+      const properties = (data && data.data && data.data.propertySearch && data.data.propertySearch.properties) || [];
+
+      if(!properties.length){
+        renderBookingState('idle', currentLang === 'ar' ? 'ما لقينا فنادق متاحة لهاي التواريخ' : 'No hotels available for these dates');
+        return;
+      }
+
+      const box = document.getElementById('bookingResults');
+      box.innerHTML =
+        '<div class="booking-back-row">' +
+          '<button class="booking-back-btn" onclick="selectBookingDestination(bookingDestinations.findIndex(d=>String(d.gaiaId)===\'' + bookingSelectedDestination.regionId + '\'))"><i data-lucide="' + (document.documentElement.dir === 'rtl' ? 'arrow-right' : 'arrow-left') + '" width="17" height="17"></i></button>' +
+          '<div class="booking-dest-name">' + bookingSelectedDestination.name + '</div>' +
+        '</div>' +
+        properties.map(p=>{
+          const name = (p.name) || (currentLang === 'ar' ? 'فندق' : 'Hotel');
+          const price = extractHotelPrice(p);
+          const rating = extractHotelRating(p);
+          const image = extractHotelImage(p);
+          const imgStyle = image ? ' style="background-image:url(\'' + image + '\')"' : '';
+          return '<div class="hotel-card">' +
+            '<div class="hotel-card-img"' + imgStyle + '></div>' +
+            '<div class="hotel-card-body">' +
+              '<h4>' + name + '</h4>' +
+              (rating ? '<div class="hotel-card-rating"><i data-lucide="star" width="12" height="12"></i><span>' + rating + '</span></div>' : '') +
+              '<div class="hotel-card-price">' + (price || (currentLang === 'ar' ? 'السعر غير متاح' : 'Price unavailable')) +
+                (price ? '<span data-en="/night">/ليلة</span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      lucide.createIcons();
+      applyLang(currentLang);
+    }catch(err){
+      if(myToken !== bookingSearchToken) return;
+      renderBookingState('error', currentLang === 'ar'
+        ? 'تعذّر جلب أسعار الفنادق. تأكد من الإنترنت وحاول مرة ثانية.'
+        : 'Could not fetch hotel prices. Check your connection and try again.');
+    }
+  }
+  window.searchHotelPrices = searchHotelPrices;
 
 </script>
 </body>
