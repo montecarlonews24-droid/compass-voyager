@@ -251,7 +251,44 @@
     font-size:9px; font-weight:800; color:var(--ocean); background:var(--seafoam);
     padding:2px 8px; border-radius:20px; margin-inline-start:8px;
   }
-  .booking-list-item{cursor:pointer;}
+  .booking-mode-tabs{
+    display:flex; gap:8px; margin-bottom:14px; background:var(--sand); border-radius:14px; padding:5px;
+  }
+  .booking-mode-tab{
+    flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+    border:none; background:transparent; border-radius:10px; padding:9px 0;
+    font-family:'Tajawal',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft);
+  }
+  .booking-mode-tab.active{background:var(--foam); color:var(--ocean); box-shadow:0 6px 14px -8px rgba(10,61,82,.3);}
+  .flight-step-label{font-size:11px; font-weight:800; color:var(--ocean); background:var(--seafoam); padding:3px 10px; border-radius:20px; display:inline-block; margin-bottom:10px;}
+  .flight-route-summary{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:var(--sand); border-radius:12px; padding:10px 12px; margin-bottom:14px;
+  }
+  .flight-route-city{font-size:12px; font-weight:800; color:var(--ink); text-align:center; flex:1;}
+  .flight-route-city span{display:block; font-size:9.5px; font-weight:600; color:var(--ink-soft); margin-top:2px;}
+  .cabin-select{
+    width:100%; border:1.5px solid var(--sand-deep); border-radius:12px;
+    padding:9px 10px; font-family:'Tajawal',sans-serif; font-size:12.5px; color:var(--ink);
+    background:var(--sand); margin-bottom:14px;
+  }
+  .flight-card{
+    background:var(--foam); border-radius:var(--radius-md); padding:14px;
+    box-shadow:0 12px 22px -14px rgba(10,61,82,.3); margin-bottom:14px;
+  }
+  .flight-card-airline{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+  .flight-card-airline img{width:20px; height:20px; border-radius:5px; object-fit:contain;}
+  .flight-card-airline span{font-size:11.5px; font-weight:700; color:var(--ink-soft);}
+  .flight-card-route{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .flight-card-time{text-align:center;}
+  .flight-card-time strong{display:block; font-size:15px; color:var(--deep-navy); font-family:'Cairo',sans-serif; font-weight:800;}
+  .flight-card-time span{font-size:9.5px; color:var(--ink-soft);}
+  .flight-card-path{flex:1; text-align:center; position:relative;}
+  .flight-card-path .line{height:2px; background:var(--sand-deep); position:relative; margin:6px 0 4px;}
+  .flight-card-path .line::after{content:'✈'; position:absolute; top:-8px; left:50%; transform:translateX(-50%) rotate(90deg); font-size:11px; color:var(--turquoise);}
+  .flight-card-path span{font-size:9px; color:var(--ink-soft);}
+  .flight-card-footer{display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px dashed var(--sand-deep);}
+  .flight-card-price{font-family:'Cairo',sans-serif; font-weight:800; font-size:16px; color:var(--deep-navy);}
   .booking-back-row{
     display:flex; align-items:center; gap:10px; margin:4px 2px 14px;
   }
@@ -958,12 +995,20 @@
       </div>
     </div>
     <div class="content" style="margin-top:-18px">
+      <div class="booking-mode-tabs">
+        <button class="booking-mode-tab active" id="modeTabHotels" onclick="switchBookingMode('hotels')">
+          <i data-lucide="bed-double" width="16" height="16"></i><span data-en="Hotels">فنادق</span>
+        </button>
+        <button class="booking-mode-tab" id="modeTabFlights" onclick="switchBookingMode('flights')">
+          <i data-lucide="plane" width="16" height="16"></i><span data-en="Flights">رحلات</span>
+        </button>
+      </div>
       <div class="booking-search-row">
         <div class="search-bar">
-          <i data-lucide="map-pin" width="17" height="17"></i>
-          <input type="text" id="bookingQueryInput" placeholder="اكتب اسم مدينة أو منطقة..." data-en-placeholder="Type a city or area..." onkeydown="if(event.key==='Enter') searchBookingDestinations()">
+          <i data-lucide="map-pin" width="17" height="17" id="bookingSearchIcon"></i>
+          <input type="text" id="bookingQueryInput" placeholder="اكتب اسم مدينة أو منطقة..." data-en-placeholder="Type a city or area..." onkeydown="if(event.key==='Enter') dispatchBookingSearch()">
         </div>
-        <button class="booking-search-btn" onclick="searchBookingDestinations()"><i data-lucide="search" width="18" height="18"></i></button>
+        <button class="booking-search-btn" onclick="dispatchBookingSearch()"><i data-lucide="search" width="18" height="18"></i></button>
       </div>
 
       <div class="section-title" style="margin-top:0">
@@ -1719,6 +1764,273 @@
     }
   }
   window.searchHotelPrices = searchHotelPrices;
+
+  // ---------- Booking Hub mode switch (Hotels / Flights) ----------
+  let bookingMode = 'hotels';
+  let flightStep = 'origin';
+  let flightAirportResults = [];
+  let flightOrigin = null;
+  let flightDestination = null;
+  let flightAdults = 1;
+
+  function switchBookingMode(mode){
+    bookingMode = mode;
+    document.getElementById('modeTabHotels').classList.toggle('active', mode === 'hotels');
+    document.getElementById('modeTabFlights').classList.toggle('active', mode === 'flights');
+    const input = document.getElementById('bookingQueryInput');
+    const titleEl = document.getElementById('bookingResultsTitle');
+    if(mode === 'hotels'){
+      bookingSelectedDestination = null;
+      input.value = '';
+      input.placeholder = currentLang === 'ar' ? 'اكتب اسم مدينة أو منطقة...' : 'Type a city or area...';
+      titleEl.textContent = currentLang === 'ar' ? 'دور على وجهة عشان نبلش' : 'Search a destination to begin';
+      document.getElementById('bookingResults').innerHTML = '';
+    } else {
+      resetFlightSearch();
+    }
+  }
+  window.switchBookingMode = switchBookingMode;
+
+  function dispatchBookingSearch(){
+    if(bookingMode === 'hotels'){
+      searchBookingDestinations();
+    } else {
+      searchFlightAirports();
+    }
+  }
+  window.dispatchBookingSearch = dispatchBookingSearch;
+
+  function resetFlightSearch(){
+    flightStep = 'origin';
+    flightOrigin = null;
+    flightDestination = null;
+    const input = document.getElementById('bookingQueryInput');
+    input.value = '';
+    input.placeholder = currentLang === 'ar' ? 'من وين رح تسافر؟' : 'Where are you flying from?';
+    document.getElementById('bookingResultsTitle').textContent = currentLang === 'ar' ? 'اختر مطار الانطلاق' : 'Choose departure airport';
+    document.getElementById('bookingResults').innerHTML = '<div class="booking-state"><i data-lucide="plane-takeoff" width="26" height="26"></i><span>' + (currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above') + '</span></div>';
+    lucide.createIcons();
+  }
+  window.resetFlightSearch = resetFlightSearch;
+
+  async function searchFlightAirports(){
+    const input = document.getElementById('bookingQueryInput');
+    const query = input ? input.value.trim() : '';
+    if(!query){
+      renderBookingState('idle', currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above');
+      return;
+    }
+    const myToken = ++bookingSearchToken;
+    renderBookingState('loading', currentLang === 'ar' ? 'عم نبحث...' : 'Searching...');
+    try{
+      const url = BOOKING_PROXY.replace('/api/hotels', '/api/flights') + '?path=api/v1/flights/searchAirport&query=' + encodeURIComponent(query) + '&locale=en-US';
+      const res = await fetch(url);
+      if(myToken !== bookingSearchToken) return;
+      if(!res.ok) throw new Error('bad-response');
+      const data = await res.json();
+      const results = Array.isArray(data && data.data) ? data.data : [];
+      if(!results.length){
+        renderBookingState('idle', currentLang === 'ar' ? 'ما لقينا نتائج مطابقة' : 'No matches found');
+        return;
+      }
+      flightAirportResults = results.slice(0, 10);
+      const box = document.getElementById('bookingResults');
+      box.innerHTML = flightAirportResults.map((r, i)=>{
+        const title = (r.presentation && r.presentation.title) || '';
+        const subtitle = (r.presentation && r.presentation.subtitle) || '';
+        return '<div class="list-item booking-list-item" onclick="selectFlightAirport(' + i + ')">' +
+          '<div class="list-icon booking-result-icon"><i data-lucide="plane" width="19" height="19"></i></div>' +
+          '<div class="list-text"><h4>' + title + '</h4><span>' + subtitle + '</span></div>' +
+          '</div>';
+      }).join('');
+      lucide.createIcons();
+    }catch(err){
+      if(myToken !== bookingSearchToken) return;
+      renderBookingState('error', currentLang === 'ar' ? 'تعذّر الاتصال. تأكد من الإنترنت.' : 'Could not connect. Check your internet.');
+    }
+  }
+  window.searchFlightAirports = searchFlightAirports;
+
+  function extractAirportParams(r){
+    const nav = r.navigation && r.navigation.relevantFlightParams;
+    return {
+      skyId: (nav && nav.skyId) || r.skyId || '',
+      entityId: (nav && nav.entityId) || r.entityId || '',
+      name: (r.presentation && r.presentation.title) || '',
+    };
+  }
+
+  function selectFlightAirport(index){
+    const r = flightAirportResults[index];
+    if(!r) return;
+    const picked = extractAirportParams(r);
+    const input = document.getElementById('bookingQueryInput');
+    const titleEl = document.getElementById('bookingResultsTitle');
+
+    if(flightStep === 'origin'){
+      flightOrigin = picked;
+      flightStep = 'destination';
+      input.value = '';
+      input.placeholder = currentLang === 'ar' ? 'وين رح تسافر؟' : 'Where are you flying to?';
+      titleEl.textContent = currentLang === 'ar' ? 'اختر مطار الوصول' : 'Choose arrival airport';
+      document.getElementById('bookingResults').innerHTML = '<div class="booking-state"><i data-lucide="plane-landing" width="26" height="26"></i><span>' + (currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above') + '</span></div>';
+      lucide.createIcons();
+    } else if(flightStep === 'destination'){
+      flightDestination = picked;
+      flightStep = 'dates';
+      renderFlightDatesForm();
+    }
+  }
+  window.selectFlightAirport = selectFlightAirport;
+
+  function renderFlightDatesForm(){
+    flightStep = 'dates';
+    document.getElementById('bookingResultsTitle').textContent = currentLang === 'ar' ? 'اختر تاريخ السفر' : 'Choose your travel date';
+    const depDate = isoDateDaysFromNow(14);
+    const box = document.getElementById('bookingResults');
+    box.innerHTML =
+      '<div class="booking-back-row">' +
+        '<button class="booking-back-btn" onclick="backToFlightOrigin()"><i data-lucide="' + (document.documentElement.dir === 'rtl' ? 'arrow-right' : 'arrow-left') + '" width="17" height="17"></i></button>' +
+        '<div class="booking-dest-name">' + flightOrigin.name + ' → ' + flightDestination.name + '</div>' +
+      '</div>' +
+      '<div class="booking-dates-card">' +
+        '<div class="date-field" style="margin-bottom:12px;"><label data-en="Departure date">تاريخ السفر</label><input type="date" id="flightDepartDate" value="' + depDate + '"></div>' +
+        '<select class="cabin-select" id="flightCabinSelect">' +
+          '<option value="economy">' + (currentLang === 'ar' ? 'اقتصادية' : 'Economy') + '</option>' +
+          '<option value="premium_economy">' + (currentLang === 'ar' ? 'اقتصادية مميزة' : 'Premium Economy') + '</option>' +
+          '<option value="business">' + (currentLang === 'ar' ? 'رجال الأعمال' : 'Business') + '</option>' +
+          '<option value="first">' + (currentLang === 'ar' ? 'الدرجة الأولى' : 'First') + '</option>' +
+        '</select>' +
+        '<div class="guest-stepper">' +
+          '<span class="guest-stepper-label" data-en="Adults">البالغين</span>' +
+          '<div class="guest-stepper-controls">' +
+            '<button class="guest-stepper-btn" onclick="adjustFlightAdults(-1)">−</button>' +
+            '<span class="guest-stepper-value" id="flightAdultsValue">' + flightAdults + '</span>' +
+            '<button class="guest-stepper-btn" onclick="adjustFlightAdults(1)">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<button class="cta-btn" onclick="searchFlightItineraries()"><i data-lucide="search" width="17" height="17"></i><span data-en="Search flights">دور على الرحلات</span></button>' +
+      '</div>';
+    lucide.createIcons();
+    applyLang(currentLang);
+  }
+  window.renderFlightDatesForm = renderFlightDatesForm;
+
+  function backToFlightOrigin(){
+    flightStep = 'origin';
+    flightDestination = null;
+    const input = document.getElementById('bookingQueryInput');
+    input.value = '';
+    input.placeholder = currentLang === 'ar' ? 'من وين رح تسافر؟' : 'Where are you flying from?';
+    document.getElementById('bookingResultsTitle').textContent = currentLang === 'ar' ? 'اختر مطار الانطلاق' : 'Choose departure airport';
+    document.getElementById('bookingResults').innerHTML = '<div class="booking-state"><i data-lucide="plane-takeoff" width="26" height="26"></i><span>' + (currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above') + '</span></div>';
+    lucide.createIcons();
+  }
+  window.backToFlightOrigin = backToFlightOrigin;
+
+  function adjustFlightAdults(delta){
+    flightAdults = Math.max(1, Math.min(8, flightAdults + delta));
+    const el = document.getElementById('flightAdultsValue');
+    if(el) el.textContent = flightAdults;
+  }
+  window.adjustFlightAdults = adjustFlightAdults;
+
+  function extractFlightPrice(it){
+    return (it && it.price && it.price.formatted) || null;
+  }
+  function extractLegTime(iso){
+    if(!iso) return '';
+    const d = new Date(iso);
+    if(isNaN(d)) return '';
+    return d.toLocaleTimeString(currentLang === 'ar' ? 'ar' : 'en', { hour: '2-digit', minute: '2-digit' });
+  }
+  function extractStopsLabel(leg){
+    const count = leg && (leg.stopCount ?? (Array.isArray(leg.stops) ? leg.stops.length : null));
+    if(count === 0) return currentLang === 'ar' ? 'مباشرة' : 'Direct';
+    if(count == null) return '';
+    return count + ' ' + (currentLang === 'ar' ? (count === 1 ? 'توقف' : 'توقفات') : (count === 1 ? 'stop' : 'stops'));
+  }
+
+  async function searchFlightItineraries(){
+    if(!flightOrigin || !flightDestination){
+      renderBookingState('error', currentLang === 'ar' ? 'اختر مطاري الانطلاق والوصول أولًا' : 'Please pick both airports first');
+      return;
+    }
+    const dateVal = document.getElementById('flightDepartDate').value;
+    const cabin = document.getElementById('flightCabinSelect').value;
+    if(!dateVal){
+      renderBookingState('error', currentLang === 'ar' ? 'اختر تاريخ السفر' : 'Please choose a travel date');
+      return;
+    }
+
+    const myToken = ++bookingSearchToken;
+    document.getElementById('bookingResultsTitle').textContent = currentLang === 'ar' ? 'نتائج الرحلات' : 'Flight results';
+    renderBookingState('loading', currentLang === 'ar' ? 'عم نجيب الأسعار...' : 'Fetching live prices...');
+
+    const params = new URLSearchParams({
+      originSkyId: flightOrigin.skyId,
+      destinationSkyId: flightDestination.skyId,
+      originEntityId: flightOrigin.entityId,
+      destinationEntityId: flightDestination.entityId,
+      date: dateVal,
+      cabinClass: cabin,
+      adults: String(flightAdults),
+      currency: 'USD',
+      market: 'en-US',
+      countryCode: 'US',
+      sortBy: 'best',
+    });
+
+    try{
+      const url = BOOKING_PROXY.replace('/api/hotels', '/api/flights') + '?path=api/v1/flights/searchFlights&' + params.toString();
+      const res = await fetch(url);
+      if(myToken !== bookingSearchToken) return;
+      if(!res.ok) throw new Error('bad-response');
+      const data = await res.json();
+      const itineraries = (data && data.data && data.data.itineraries) || [];
+
+      if(!itineraries.length){
+        renderBookingState('idle', currentLang === 'ar' ? 'ما لقينا رحلات متاحة لهاي التواريخ' : 'No flights available for this date');
+        return;
+      }
+
+      const box = document.getElementById('bookingResults');
+      box.innerHTML =
+        '<div class="booking-back-row">' +
+          '<button class="booking-back-btn" onclick="renderFlightDatesForm()"><i data-lucide="' + (document.documentElement.dir === 'rtl' ? 'arrow-right' : 'arrow-left') + '" width="17" height="17"></i></button>' +
+          '<div class="booking-dest-name">' + flightOrigin.name + ' → ' + flightDestination.name + '</div>' +
+        '</div>' +
+        itineraries.slice(0, 15).map(it=>{
+          const leg = it.legs && it.legs[0];
+          const price = extractFlightPrice(it);
+          const carrier = leg && leg.carriers && leg.carriers.marketing && leg.carriers.marketing[0];
+          const airlineName = (carrier && carrier.name) || '';
+          const airlineLogo = (carrier && carrier.logoUrl) || '';
+          const depTime = leg && extractLegTime(leg.departure);
+          const arrTime = leg && extractLegTime(leg.arrival);
+          const stopsLabel = leg && extractStopsLabel(leg);
+          return '<div class="flight-card">' +
+            '<div class="flight-card-airline">' +
+              (airlineLogo ? '<img src="' + airlineLogo + '" alt="">' : '') +
+              '<span>' + airlineName + '</span>' +
+            '</div>' +
+            '<div class="flight-card-route">' +
+              '<div class="flight-card-time"><strong>' + depTime + '</strong><span>' + flightOrigin.name + '</span></div>' +
+              '<div class="flight-card-path"><div class="line"></div><span>' + stopsLabel + '</span></div>' +
+              '<div class="flight-card-time"><strong>' + arrTime + '</strong><span>' + flightDestination.name + '</span></div>' +
+            '</div>' +
+            '<div class="flight-card-footer">' +
+              '<div class="flight-card-price">' + (price || (currentLang === 'ar' ? 'السعر غير متاح' : 'Price unavailable')) + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      lucide.createIcons();
+    }catch(err){
+      if(myToken !== bookingSearchToken) return;
+      renderBookingState('error', currentLang === 'ar' ? 'تعذّر جلب أسعار الرحلات. حاول مرة ثانية.' : 'Could not fetch flight prices. Try again.');
+    }
+  }
+  window.searchFlightItineraries = searchFlightItineraries;
 
 </script>
 </body>
