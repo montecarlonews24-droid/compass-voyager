@@ -1940,9 +1940,19 @@
   }
   function extractLegTime(iso){
     if(!iso) return '';
-    const d = new Date(iso);
-    if(isNaN(d)) return '';
-    return d.toLocaleTimeString(currentLang === 'ar' ? 'ar' : 'en', { hour: '2-digit', minute: '2-digit' });
+    // Read the wall-clock hour/minute exactly as returned by the API (local time
+    // at that airport). We deliberately avoid new Date().toLocaleTimeString()
+    // here because it silently converts to the *device's* timezone, which made
+    // arrival times look many hours off from the real flight duration.
+    const match = String(iso).match(/T(\d{2}):(\d{2})/);
+    if(!match) return '';
+    const hour24 = parseInt(match[1], 10);
+    const minute = match[2];
+    const isAr = currentLang === 'ar';
+    const period = hour24 < 12 ? (isAr ? 'ص' : 'AM') : (isAr ? 'م' : 'PM');
+    let hour12 = hour24 % 12;
+    if(hour12 === 0) hour12 = 12;
+    return String(hour12).padStart(2, '0') + ':' + minute + ' ' + period;
   }
   function extractStopsLabel(leg){
     const count = leg && (leg.stopCount ?? (Array.isArray(leg.stops) ? leg.stops.length : null));
