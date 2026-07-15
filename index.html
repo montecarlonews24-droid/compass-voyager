@@ -306,6 +306,40 @@
   }
   .country-info-note{font-size:9.5px; color:var(--ink-soft); text-align:center; margin-top:10px;}
 
+  .country-info-section-label{
+    font-size:11px; font-weight:800; color:var(--ink-soft); margin:16px 2px 8px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .emergency-general-row{
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(135deg,var(--coral),#B8151A);
+    border-radius:12px; padding:10px 14px; color:#fff; margin-bottom:8px;
+  }
+  .emergency-general-row span{font-size:10.5px; font-weight:700; opacity:.92;}
+  .emergency-general-row b{font-family:'Cairo',sans-serif; font-size:19px; font-weight:800;}
+  .emergency-numbers-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;}
+  .emergency-number-item{background:#FBE7E7; border-radius:12px; padding:9px 4px; text-align:center;}
+  .emergency-number-item b{display:block; font-family:'Cairo',sans-serif; font-weight:800; font-size:15px; color:var(--coral);}
+  .emergency-number-item small{font-size:8.5px; color:var(--ink-soft); font-weight:700;}
+
+  .embassy-card{
+    background:var(--sand); border-radius:14px; padding:12px; margin-top:2px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .embassy-card-icon{
+    width:36px; height:36px; border-radius:11px; flex-shrink:0;
+    background:var(--seafoam); color:var(--ocean);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .embassy-card-text{flex:1; min-width:0;}
+  .embassy-card-text h4{font-size:12px; margin:0 0 2px; color:var(--ink); line-height:1.3;}
+  .embassy-card-text span{font-size:9.5px; color:var(--ink-soft); line-height:1.4; display:block;}
+  .embassy-search-btn{
+    display:flex; align-items:center; gap:5px; flex-shrink:0;
+    background:var(--ocean); color:#fff; border-radius:10px; padding:8px 11px;
+    font-size:10.5px; font-weight:700; text-decoration:none; white-space:nowrap;
+  }
+
   /* Booking Hub */
   .booking-search-row{display:flex; gap:8px; margin-bottom:14px;}
   .booking-search-row .search-bar{flex:1; margin-bottom:0;}
@@ -1157,7 +1191,47 @@
             <b id="countryInfoDestTime">--:--</b>
           </div>
         </div>
-        <p class="country-info-note" data-en="Time is live · population, area, and temperature are typical figures">الوقت مباشر · عدد السكان والمساحة والحرارة أرقام تقريبية نموذجية</p>
+
+        <div class="country-info-section-label">
+          <i data-lucide="siren" width="13" height="13"></i>
+          <span data-en="Emergency numbers">أرقام الطوارئ</span>
+        </div>
+        <div class="emergency-general-row">
+          <span data-en="When in doubt, dial">لو ما بتعرف مين تتصل، اتصل على</span>
+          <b id="emergencyGeneralNumber">—</b>
+        </div>
+        <div class="emergency-numbers-grid">
+          <div class="emergency-number-item">
+            <b id="emergencyPoliceNumber">—</b>
+            <small data-en="Police">الشرطة</small>
+          </div>
+          <div class="emergency-number-item">
+            <b id="emergencyAmbulanceNumber">—</b>
+            <small data-en="Ambulance">الإسعاف</small>
+          </div>
+          <div class="emergency-number-item">
+            <b id="emergencyFireNumber">—</b>
+            <small data-en="Fire">الدفاع المدني</small>
+          </div>
+        </div>
+
+        <div class="country-info-section-label">
+          <i data-lucide="building-2" width="13" height="13"></i>
+          <span data-en="Your embassy">سفارتك</span>
+        </div>
+        <div class="embassy-card">
+          <div class="embassy-card-icon"><i data-lucide="building-2" width="17" height="17"></i></div>
+          <div class="embassy-card-text">
+            <h4 id="embassyTitle">—</h4>
+            <span id="embassySubtitle">—</span>
+          </div>
+          <a class="embassy-search-btn" id="embassySearchLink" href="#" target="_blank" rel="noopener">
+            <i data-lucide="search" width="13" height="13"></i>
+            <span data-en="Find it">دور عليها</span>
+          </a>
+        </div>
+
+        <p class="country-info-note" data-en="Time is live · population, area, and temperature are typical figures · verify emergency and embassy numbers with an official source before you travel">الوقت مباشر · عدد السكان والمساحة والحرارة أرقام تقريبية نموذجية · تأكد من أرقام الطوارئ والسفارة عبر مصدر رسمي قبل السفر</p>
       </div>
 
       <!-- Category filters (multi-select) -->
@@ -1653,9 +1727,15 @@
   }
   window.adjustSignupAge = adjustSignupAge;
 
+  let userNationality = null; // {code, ar, en} — captured at signup for embassy lookups
+  let userCountryOfResidence = null;
+
   function completeSignup(){
-    // In a real app this would submit { provider, age, nationality, country }
-    // to a backend. Here we just carry on into the app.
+    const natCode = document.getElementById('signupNationality').value;
+    const resCode = document.getElementById('signupCountry').value;
+    userNationality = COUNTRIES.find(c => c.code === natCode) || null;
+    userCountryOfResidence = COUNTRIES.find(c => c.code === resCode) || null;
+    // In a real app this would also submit { provider, age } to a backend.
     goToScreen('screen-home');
   }
   window.completeSignup = completeSignup;
@@ -1880,6 +1960,48 @@
     RU:{capitalAr:'موسكو',capitalEn:'Moscow',continentAr:'أوروبا وآسيا',continentEn:'Europe & Asia',population:'144 مليون',populationEn:'144M',languageAr:'الروسية',languageEn:'Russian',currencyAr:'روبل روسي (RUB)',currencyEn:'Russian Ruble (RUB)',area:'17,098,242 كم²',areaEn:'17,098,242 km²',tz:'Europe/Moscow',temp:9,icon:'cloud'}
   };
 
+  // Local emergency service numbers per destination country. Sourced from
+  // official/government pages and reputable travel-safety guides (checked via
+  // web search), not recalled from memory — accuracy matters here. Still,
+  // numbers change; the UI reminds people to confirm before relying on them.
+  const EMERGENCY_NUMBERS = {
+    FR:{general:'112', police:'17', ambulance:'15', fire:'18'},
+    AE:{general:'999', police:'999', ambulance:'998', fire:'997'},
+    SA:{general:'911', police:'999', ambulance:'997', fire:'998'},
+    QA:{general:'999', police:'999', ambulance:'999', fire:'999'},
+    KW:{general:'112', police:'112', ambulance:'112', fire:'112'},
+    BH:{general:'999', police:'999', ambulance:'999', fire:'999'},
+    OM:{general:'9999', police:'9999', ambulance:'9999', fire:'9999'},
+    EG:{general:'112', police:'122', ambulance:'123', fire:'180'},
+    JO:{general:'911', police:'191', ambulance:'193', fire:'199'},
+    LB:{general:'112', police:'112', ambulance:'140', fire:'175'},
+    MA:{general:'19', police:'19', ambulance:'15', fire:'150'},
+    TN:{general:'197', police:'197', ambulance:'190', fire:'198'},
+    TR:{general:'112', police:'155', ambulance:'112', fire:'110'},
+    GB:{general:'999', police:'999', ambulance:'999', fire:'999'},
+    DE:{general:'112', police:'110', ambulance:'112', fire:'112'},
+    IT:{general:'112', police:'113', ambulance:'118', fire:'115'},
+    ES:{general:'112', police:'112', ambulance:'112', fire:'112'},
+    NL:{general:'112', police:'112', ambulance:'112', fire:'112'},
+    CH:{general:'112', police:'117', ambulance:'144', fire:'118'},
+    JP:{general:'110', police:'110', ambulance:'119', fire:'119'},
+    CN:{general:'110', police:'110', ambulance:'120', fire:'119'},
+    KR:{general:'112', police:'112', ambulance:'119', fire:'119'},
+    IN:{general:'112', police:'112', ambulance:'112', fire:'112'},
+    ID:{general:'112', police:'110', ambulance:'119', fire:'113'},
+    MY:{general:'999', police:'999', ambulance:'999', fire:'999'},
+    TH:{general:'191', police:'191', ambulance:'1669', fire:'199'},
+    SG:{general:'999', police:'999', ambulance:'995', fire:'995'},
+    US:{general:'911', police:'911', ambulance:'911', fire:'911'},
+    CA:{general:'911', police:'911', ambulance:'911', fire:'911'},
+    BR:{general:'190', police:'190', ambulance:'192', fire:'193'},
+    MX:{general:'911', police:'911', ambulance:'911', fire:'911'},
+    AR:{general:'911', police:'101', ambulance:'107', fire:'100'},
+    AU:{general:'000', police:'000', ambulance:'000', fire:'000'},
+    ZA:{general:'112', police:'10111', ambulance:'10177', fire:'10177'},
+    RU:{general:'112', police:'102', ambulance:'103', fire:'101'}
+  };
+
   function countryFlagEmoji(code){
     return String.fromCodePoint(...code.split('').map(c => 127397 + c.charCodeAt(0)));
   }
@@ -1961,11 +2083,67 @@
     document.getElementById('countryInfoArea').textContent = currentLang === 'ar' ? d.area : d.areaEn;
     document.getElementById('countryInfoTemp').textContent = d.temp + '°C';
 
+    const em = EMERGENCY_NUMBERS[match.code];
+    if(em){
+      document.getElementById('emergencyGeneralNumber').textContent = em.general;
+      document.getElementById('emergencyPoliceNumber').textContent = em.police;
+      document.getElementById('emergencyAmbulanceNumber').textContent = em.ambulance;
+      document.getElementById('emergencyFireNumber').textContent = em.fire;
+    }
+
+    renderEmbassySection(match);
+
     updateCountryInfoTimes();
     card.classList.add('show');
     lucide.createIcons();
   }
   window.tryShowCountryInfo = tryShowCountryInfo;
+
+  // We don't have (and won't fabricate) a live directory of every embassy's
+  // phone number per nationality — that's exactly the kind of specific detail
+  // that's dangerous to get wrong in an emergency. Instead we point people to
+  // a live, official search so they get the current, correct number.
+  function renderEmbassySection(destination){
+    const titleEl = document.getElementById('embassyTitle');
+    const subEl = document.getElementById('embassySubtitle');
+    const linkEl = document.getElementById('embassySearchLink');
+    const destName = currentLang === 'ar' ? destination.ar : destination.en;
+
+    if(userNationality && userNationality.code === destination.code){
+      setLocalizedText(titleEl,
+        'أنت من مواطني ' + destination.ar,
+        "You're a citizen of " + destination.en
+      );
+      setLocalizedText(subEl, 'ما في داعي لسفارة هون', "No embassy needed here");
+      linkEl.style.visibility = 'hidden';
+      return;
+    }
+    linkEl.style.visibility = 'visible';
+
+    if(userNationality){
+      setLocalizedText(titleEl,
+        'سفارة ' + userNationality.ar + ' في ' + destination.ar,
+        userNationality.en + ' Embassy in ' + destination.en
+      );
+      setLocalizedText(subEl,
+        'تأكد من الرقم عبر الموقع الرسمي قبل السفر',
+        'Verify the number on the official site before you travel'
+      );
+      const q = userNationality.en + ' Embassy in ' + destination.en + ' emergency contact number';
+      linkEl.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+    } else {
+      setLocalizedText(titleEl,
+        'أضف جنسيتك لنساعدك تلاقي سفارتك',
+        'Add your nationality so we can help you find your embassy'
+      );
+      setLocalizedText(subEl,
+        'ما زودتنا بجنسيتك عند إنشاء الحساب',
+        "You skipped this during account creation"
+      );
+      const q = 'list of foreign embassies in ' + destName;
+      linkEl.href = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+    }
+  }
 
   setInterval(updateCountryInfoTimes, 30000);
 
