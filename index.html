@@ -346,6 +346,33 @@
   .hotel-card-price{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:var(--deep-navy);}
   .hotel-card-price span{font-size:9.5px; color:var(--ink-soft); font-weight:600; margin-inline-start:4px;}
 
+  /* Sign-up screen */
+  .social-btn{
+    width:100%; display:flex; align-items:center; gap:12px;
+    background:var(--sand); border:1.5px solid var(--sand-deep); border-radius:14px;
+    padding:12px 14px; margin-bottom:10px;
+    font-family:'Tajawal',sans-serif; font-weight:700; font-size:13px; color:var(--ink);
+    cursor:pointer; text-align:start;
+  }
+  .social-btn:last-child{margin-bottom:0;}
+  .social-icon-badge{
+    width:30px; height:30px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:'Cairo',sans-serif; font-weight:800; font-size:14px;
+  }
+  .social-icon-badge.google{background:#fff; border:1.5px solid var(--sand-deep); color:#4285F4;}
+  .social-icon-badge.facebook{background:#1877F2;}
+  .social-icon-badge.instagram{background:linear-gradient(135deg,#F58529,#DD2A7B,#8134AF,#515BD4);}
+  .signup-terms{font-size:10px; color:var(--ink-soft); text-align:center; margin:14px 4px 0; line-height:1.6;}
+  .signup-skip{
+    display:block; text-align:center; font-size:12px; font-weight:700;
+    color:var(--ink-soft); margin-top:16px;
+  }
+  .signup-back-link{
+    display:flex; align-items:center; justify-content:center; gap:5px;
+    color:var(--ocean); font-size:12.5px; font-weight:700; margin-top:16px; cursor:pointer;
+  }
+
   /* Bottom nav */
   .bottom-nav{
     position:fixed; bottom:0; left:50%; transform:translateX(-50%);
@@ -369,6 +396,7 @@
   }
   .screen{display:none;}
   .screen.active{display:block;}
+  body:has(#screen-signup.active) .bottom-nav{display:none;}
 
   .fav-toggle{
     position:absolute; top:8px; inset-inline-end:8px;
@@ -606,8 +634,94 @@
 <body>
 <div class="device">
 
+  <!-- ================= SIGN UP ================= -->
+  <div class="screen active" id="screen-signup">
+    <div class="wave-header" style="padding-bottom:38px;">
+      <div class="top-row">
+        <div class="brand">
+          <div class="brand-badge"><i data-lucide="compass" width="20" height="20"></i></div>
+          <div>
+            <div class="brand-name" data-en="Compass Voyager">Compass Voyager</div>
+            <div class="brand-sub">بوصلة المسافر</div>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">AR</span></button>
+        </div>
+      </div>
+      <div class="hero-line">
+        <h1 data-en="Create your account">أنشئ حسابك</h1>
+        <p data-en="One quick step before we personalize your trips">خطوة سريعة قبل ما نخصص رحلاتك</p>
+      </div>
+    </div>
+
+    <div class="content" style="margin-top:-18px; padding-bottom:40px;">
+
+      <!-- Step 1: choose a provider -->
+      <div id="signupStepAuth">
+        <div class="filter-card" style="padding:16px;">
+          <button class="social-btn" type="button" onclick="chooseSignupProvider('google')">
+            <span class="social-icon-badge google"><span>G</span></span>
+            <span data-en="Continue with Google">تابع عبر جوجل</span>
+          </button>
+          <button class="social-btn" type="button" onclick="chooseSignupProvider('facebook')">
+            <span class="social-icon-badge facebook"><span>f</span></span>
+            <span data-en="Continue with Facebook">تابع عبر فيسبوك</span>
+          </button>
+          <button class="social-btn" type="button" onclick="chooseSignupProvider('instagram')">
+            <span class="social-icon-badge instagram"><i data-lucide="camera" width="15" height="15"></i></span>
+            <span data-en="Continue with Instagram">تابع عبر إنستقرام</span>
+          </button>
+        </div>
+        <p class="signup-terms" data-en="By continuing, you agree to our Terms of Service and Privacy Policy">بمتابعتك، انت موافق على شروط الاستخدام وسياسة الخصوصية</p>
+        <span class="signup-skip" onclick="goToScreen('screen-home')" data-en="Skip for now">تخطي الآن</span>
+      </div>
+
+      <!-- Step 2: a few personal details -->
+      <div id="signupStepDetails" style="display:none;">
+        <div class="flight-step-label" id="signupProviderLabel" data-en="Signing up with Google">التسجيل عبر جوجل</div>
+        <div class="filter-card" style="padding:16px;">
+          <div class="section-title" style="margin-top:0">
+            <h2><i data-lucide="user-round" width="15" height="15" style="vertical-align:-2px;color:var(--turquoise)"></i>
+              <span data-en="A few details">شوي تفاصيل</span></h2>
+          </div>
+
+          <div class="guest-stepper">
+            <span class="guest-stepper-label" data-en="Age">العمر</span>
+            <div class="guest-stepper-controls">
+              <button class="guest-stepper-btn" type="button" onclick="adjustSignupAge(-1)">−</button>
+              <span class="guest-stepper-value" id="signupAgeValue">25</span>
+              <button class="guest-stepper-btn" type="button" onclick="adjustSignupAge(1)">+</button>
+            </div>
+          </div>
+
+          <div class="date-field" style="margin-bottom:12px;">
+            <label data-en="Nationality">الجنسية</label>
+            <select class="cabin-select" id="signupNationality" style="margin-bottom:0;"></select>
+          </div>
+
+          <div class="date-field" style="margin-bottom:0;">
+            <label data-en="Country of residence">بلد الإقامة</label>
+            <select class="cabin-select" id="signupCountry" style="margin-bottom:0;"></select>
+          </div>
+        </div>
+
+        <button class="cta-btn" style="margin-top:14px;" onclick="completeSignup()">
+          <i data-lucide="check" width="17" height="17"></i>
+          <span data-en="Create account">أنشئ الحساب</span>
+        </button>
+
+        <div class="signup-back-link" onclick="backToSignupAuth()">
+          <i data-lucide="arrow-left" width="14" height="14"></i>
+          <span data-en="Back">رجوع</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= HOME ================= -->
-  <div class="screen active" id="screen-home">
+  <div class="screen" id="screen-home">
     <div class="wave-header">
       <div class="top-row">
         <div class="brand">
@@ -1101,8 +1215,222 @@
 
   function toggleLang(){
     applyLang(currentLang === 'ar' ? 'en' : 'ar');
+    populateCountrySelects();
   }
   window.toggleLang = toggleLang;
+
+  // ---------- Sign-up flow ----------
+  const COUNTRIES = [
+    {code:'AE', en:'United Arab Emirates', ar:'الإمارات العربية المتحدة'},
+    {code:'SA', en:'Saudi Arabia', ar:'السعودية'},
+    {code:'QA', en:'Qatar', ar:'قطر'},
+    {code:'KW', en:'Kuwait', ar:'الكويت'},
+    {code:'BH', en:'Bahrain', ar:'البحرين'},
+    {code:'OM', en:'Oman', ar:'عُمان'},
+    {code:'JO', en:'Jordan', ar:'الأردن'},
+    {code:'LB', en:'Lebanon', ar:'لبنان'},
+    {code:'SY', en:'Syria', ar:'سوريا'},
+    {code:'IQ', en:'Iraq', ar:'العراق'},
+    {code:'PS', en:'Palestine', ar:'فلسطين'},
+    {code:'EG', en:'Egypt', ar:'مصر'},
+    {code:'LY', en:'Libya', ar:'ليبيا'},
+    {code:'TN', en:'Tunisia', ar:'تونس'},
+    {code:'DZ', en:'Algeria', ar:'الجزائر'},
+    {code:'MA', en:'Morocco', ar:'المغرب'},
+    {code:'SD', en:'Sudan', ar:'السودان'},
+    {code:'SS', en:'South Sudan', ar:'جنوب السودان'},
+    {code:'YE', en:'Yemen', ar:'اليمن'},
+    {code:'MR', en:'Mauritania', ar:'موريتانيا'},
+    {code:'SO', en:'Somalia', ar:'الصومال'},
+    {code:'DJ', en:'Djibouti', ar:'جيبوتي'},
+    {code:'KM', en:'Comoros', ar:'جزر القمر'},
+    {code:'TR', en:'Turkey', ar:'تركيا'},
+    {code:'IR', en:'Iran', ar:'إيران'},
+    {code:'AF', en:'Afghanistan', ar:'أفغانستان'},
+    {code:'PK', en:'Pakistan', ar:'باكستان'},
+    {code:'IN', en:'India', ar:'الهند'},
+    {code:'BD', en:'Bangladesh', ar:'بنغلاديش'},
+    {code:'LK', en:'Sri Lanka', ar:'سريلانكا'},
+    {code:'NP', en:'Nepal', ar:'نيبال'},
+    {code:'MV', en:'Maldives', ar:'جزر المالديف'},
+    {code:'CN', en:'China', ar:'الصين'},
+    {code:'JP', en:'Japan', ar:'اليابان'},
+    {code:'KR', en:'South Korea', ar:'كوريا الجنوبية'},
+    {code:'KP', en:'North Korea', ar:'كوريا الشمالية'},
+    {code:'TW', en:'Taiwan', ar:'تايوان'},
+    {code:'HK', en:'Hong Kong', ar:'هونغ كونغ'},
+    {code:'MN', en:'Mongolia', ar:'منغوليا'},
+    {code:'ID', en:'Indonesia', ar:'إندونيسيا'},
+    {code:'MY', en:'Malaysia', ar:'ماليزيا'},
+    {code:'SG', en:'Singapore', ar:'سنغافورة'},
+    {code:'TH', en:'Thailand', ar:'تايلاند'},
+    {code:'VN', en:'Vietnam', ar:'فيتنام'},
+    {code:'PH', en:'Philippines', ar:'الفلبين'},
+    {code:'MM', en:'Myanmar', ar:'ميانمار'},
+    {code:'KH', en:'Cambodia', ar:'كمبوديا'},
+    {code:'LA', en:'Laos', ar:'لاوس'},
+    {code:'BN', en:'Brunei', ar:'بروناي'},
+    {code:'KZ', en:'Kazakhstan', ar:'كازاخستان'},
+    {code:'UZ', en:'Uzbekistan', ar:'أوزبكستان'},
+    {code:'TM', en:'Turkmenistan', ar:'تركمانستان'},
+    {code:'KG', en:'Kyrgyzstan', ar:'قيرغيزستان'},
+    {code:'TJ', en:'Tajikistan', ar:'طاجيكستان'},
+    {code:'AZ', en:'Azerbaijan', ar:'أذربيجان'},
+    {code:'AM', en:'Armenia', ar:'أرمينيا'},
+    {code:'GE', en:'Georgia', ar:'جورجيا'},
+    {code:'IL', en:'Israel', ar:'إسرائيل'},
+    {code:'CY', en:'Cyprus', ar:'قبرص'},
+    {code:'GB', en:'United Kingdom', ar:'المملكة المتحدة'},
+    {code:'IE', en:'Ireland', ar:'أيرلندا'},
+    {code:'FR', en:'France', ar:'فرنسا'},
+    {code:'DE', en:'Germany', ar:'ألمانيا'},
+    {code:'NL', en:'Netherlands', ar:'هولندا'},
+    {code:'BE', en:'Belgium', ar:'بلجيكا'},
+    {code:'LU', en:'Luxembourg', ar:'لوكسمبورغ'},
+    {code:'CH', en:'Switzerland', ar:'سويسرا'},
+    {code:'AT', en:'Austria', ar:'النمسا'},
+    {code:'ES', en:'Spain', ar:'إسبانيا'},
+    {code:'PT', en:'Portugal', ar:'البرتغال'},
+    {code:'IT', en:'Italy', ar:'إيطاليا'},
+    {code:'MT', en:'Malta', ar:'مالطا'},
+    {code:'GR', en:'Greece', ar:'اليونان'},
+    {code:'DK', en:'Denmark', ar:'الدنمارك'},
+    {code:'SE', en:'Sweden', ar:'السويد'},
+    {code:'NO', en:'Norway', ar:'النرويج'},
+    {code:'FI', en:'Finland', ar:'فنلندا'},
+    {code:'IS', en:'Iceland', ar:'آيسلندا'},
+    {code:'PL', en:'Poland', ar:'بولندا'},
+    {code:'CZ', en:'Czech Republic', ar:'التشيك'},
+    {code:'SK', en:'Slovakia', ar:'سلوفاكيا'},
+    {code:'HU', en:'Hungary', ar:'المجر'},
+    {code:'RO', en:'Romania', ar:'رومانيا'},
+    {code:'BG', en:'Bulgaria', ar:'بلغاريا'},
+    {code:'HR', en:'Croatia', ar:'كرواتيا'},
+    {code:'SI', en:'Slovenia', ar:'سلوفينيا'},
+    {code:'RS', en:'Serbia', ar:'صربيا'},
+    {code:'BA', en:'Bosnia and Herzegovina', ar:'البوسنة والهرسك'},
+    {code:'ME', en:'Montenegro', ar:'الجبل الأسود'},
+    {code:'MK', en:'North Macedonia', ar:'مقدونيا الشمالية'},
+    {code:'AL', en:'Albania', ar:'ألبانيا'},
+    {code:'EE', en:'Estonia', ar:'إستونيا'},
+    {code:'LV', en:'Latvia', ar:'لاتفيا'},
+    {code:'LT', en:'Lithuania', ar:'ليتوانيا'},
+    {code:'UA', en:'Ukraine', ar:'أوكرانيا'},
+    {code:'BY', en:'Belarus', ar:'بيلاروسيا'},
+    {code:'MD', en:'Moldova', ar:'مولدوفا'},
+    {code:'RU', en:'Russia', ar:'روسيا'},
+    {code:'AD', en:'Andorra', ar:'أندورا'},
+    {code:'MC', en:'Monaco', ar:'موناكو'},
+    {code:'LI', en:'Liechtenstein', ar:'ليختنشتاين'},
+    {code:'US', en:'United States', ar:'الولايات المتحدة'},
+    {code:'CA', en:'Canada', ar:'كندا'},
+    {code:'MX', en:'Mexico', ar:'المكسيك'},
+    {code:'BR', en:'Brazil', ar:'البرازيل'},
+    {code:'AR', en:'Argentina', ar:'الأرجنتين'},
+    {code:'CL', en:'Chile', ar:'تشيلي'},
+    {code:'CO', en:'Colombia', ar:'كولومبيا'},
+    {code:'PE', en:'Peru', ar:'بيرو'},
+    {code:'VE', en:'Venezuela', ar:'فنزويلا'},
+    {code:'EC', en:'Ecuador', ar:'الإكوادور'},
+    {code:'BO', en:'Bolivia', ar:'بوليفيا'},
+    {code:'PY', en:'Paraguay', ar:'باراغواي'},
+    {code:'UY', en:'Uruguay', ar:'الأوروغواي'},
+    {code:'CR', en:'Costa Rica', ar:'كوستاريكا'},
+    {code:'PA', en:'Panama', ar:'بنما'},
+    {code:'GT', en:'Guatemala', ar:'غواتيمالا'},
+    {code:'HN', en:'Honduras', ar:'هندوراس'},
+    {code:'SV', en:'El Salvador', ar:'السلفادور'},
+    {code:'NI', en:'Nicaragua', ar:'نيكاراغوا'},
+    {code:'CU', en:'Cuba', ar:'كوبا'},
+    {code:'DO', en:'Dominican Republic', ar:'جمهورية الدومينيكان'},
+    {code:'JM', en:'Jamaica', ar:'جامايكا'},
+    {code:'HT', en:'Haiti', ar:'هايتي'},
+    {code:'ZA', en:'South Africa', ar:'جنوب أفريقيا'},
+    {code:'NG', en:'Nigeria', ar:'نيجيريا'},
+    {code:'KE', en:'Kenya', ar:'كينيا'},
+    {code:'ET', en:'Ethiopia', ar:'إثيوبيا'},
+    {code:'GH', en:'Ghana', ar:'غانا'},
+    {code:'TZ', en:'Tanzania', ar:'تنزانيا'},
+    {code:'UG', en:'Uganda', ar:'أوغندا'},
+    {code:'RW', en:'Rwanda', ar:'رواندا'},
+    {code:'SN', en:'Senegal', ar:'السنغال'},
+    {code:'CI', en:"Ivory Coast", ar:'ساحل العاج'},
+    {code:'CM', en:'Cameroon', ar:'الكاميرون'},
+    {code:'ML', en:'Mali', ar:'مالي'},
+    {code:'NE', en:'Niger', ar:'النيجر'},
+    {code:'TD', en:'Chad', ar:'تشاد'},
+    {code:'GN', en:'Guinea', ar:'غينيا'},
+    {code:'MZ', en:'Mozambique', ar:'موزمبيق'},
+    {code:'ZM', en:'Zambia', ar:'زامبيا'},
+    {code:'ZW', en:'Zimbabwe', ar:'زيمبابوي'},
+    {code:'NA', en:'Namibia', ar:'ناميبيا'},
+    {code:'MG', en:'Madagascar', ar:'مدغشقر'},
+    {code:'MU', en:'Mauritius', ar:'موريشيوس'},
+    {code:'SC', en:'Seychelles', ar:'سيشل'},
+    {code:'AU', en:'Australia', ar:'أستراليا'},
+    {code:'NZ', en:'New Zealand', ar:'نيوزيلندا'},
+    {code:'PG', en:'Papua New Guinea', ar:'بابوا غينيا الجديدة'}
+  ];
+
+  function populateCountrySelects(){
+    const sorted = [...COUNTRIES].sort((a,b)=>
+      currentLang === 'ar' ? a.ar.localeCompare(b.ar,'ar') : a.en.localeCompare(b.en)
+    );
+    ['signupNationality','signupCountry'].forEach(id=>{
+      const sel = document.getElementById(id);
+      if(!sel) return;
+      const prevValue = sel.value;
+      sel.innerHTML = sorted.map(c=>
+        '<option value="'+c.code+'">' + (currentLang === 'ar' ? c.ar : c.en) + '</option>'
+      ).join('');
+      if(prevValue) sel.value = prevValue;
+      else if(sel.id === 'signupNationality') sel.value = 'AE';
+      else sel.value = 'AE';
+    });
+  }
+  window.populateCountrySelects = populateCountrySelects;
+
+  let signupProvider = null;
+  let signupAge = 25;
+
+  const SIGNUP_PROVIDER_NAMES = {
+    google:{ar:'جوجل', en:'Google'},
+    facebook:{ar:'فيسبوك', en:'Facebook'},
+    instagram:{ar:'إنستقرام', en:'Instagram'}
+  };
+
+  function chooseSignupProvider(provider){
+    signupProvider = provider;
+    const label = document.getElementById('signupProviderLabel');
+    const p = SIGNUP_PROVIDER_NAMES[provider];
+    if(label && p){
+      setLocalizedText(label, 'التسجيل عبر ' + p.ar, 'Signing up with ' + p.en);
+    }
+    document.getElementById('signupStepAuth').style.display = 'none';
+    document.getElementById('signupStepDetails').style.display = 'block';
+    lucide.createIcons();
+  }
+  window.chooseSignupProvider = chooseSignupProvider;
+
+  function backToSignupAuth(){
+    document.getElementById('signupStepDetails').style.display = 'none';
+    document.getElementById('signupStepAuth').style.display = 'block';
+  }
+  window.backToSignupAuth = backToSignupAuth;
+
+  function adjustSignupAge(delta){
+    signupAge = Math.max(13, Math.min(99, signupAge + delta));
+    const el = document.getElementById('signupAgeValue');
+    if(el) el.textContent = signupAge;
+  }
+  window.adjustSignupAge = adjustSignupAge;
+
+  function completeSignup(){
+    // In a real app this would submit { provider, age, nationality, country }
+    // to a backend. Here we just carry on into the app.
+    goToScreen('screen-home');
+  }
+  window.completeSignup = completeSignup;
 
   let currentTheme = 'light';
   function applyTheme(theme){
@@ -2150,6 +2478,7 @@
 
   // English is now the app's primary/default language.
   applyLang('en');
+  populateCountrySelects();
 
 </script>
 </body>
