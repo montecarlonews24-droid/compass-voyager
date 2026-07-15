@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -1044,7 +1044,7 @@
 <script>
   lucide.createIcons();
 
-  let currentLang = 'ar';
+  let currentLang = 'en';
   const titleEl = document.getElementById('pageTitle');
   const titleAr = 'بوصلة المسافر | Compass Voyager';
   const titleEn = 'Compass Voyager | Travel Planner';
@@ -2147,6 +2147,9 @@
     }
   }
   window.searchFlightItineraries = searchFlightItineraries;
+
+  // English is now the app's primary/default language.
+  applyLang('en');
 
 </script>
 </body>
