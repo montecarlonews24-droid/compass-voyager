@@ -62,6 +62,7 @@
     color:var(--foam);
     border-radius:0 0 42% 42%/0 0 34px 34px;
     overflow:hidden;
+    transition:background .35s ease;
   }
   .wave-header::after{
     content:"";
@@ -102,8 +103,15 @@
   }
   .lang-btn-label{letter-spacing:.3px;}
   .hero-line{position:relative; z-index:2; margin-top:20px;}
-  .hero-line h1{font-size:22px; font-weight:800; margin:0 0 4px;}
-  .hero-line p{font-size:12.5px; color:var(--seafoam); margin:0; opacity:.9;}
+  .hero-line h1{font-size:22px; font-weight:800; margin:0 0 4px; transition:opacity .2s ease;}
+  .hero-line p{font-size:12.5px; color:var(--seafoam); margin:0; opacity:.9; transition:opacity .2s ease;}
+  .trip-mode-pill{
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32);
+    border-radius:20px; padding:5px 12px 5px 10px; margin-top:12px;
+    font-size:10.5px; font-weight:700; color:var(--foam);
+  }
+  .trip-mode-pill i{width:12px;height:12px;}
 
   /* ---------- Content ---------- */
   .content{padding:0 18px 100px; margin-top:-24px; position:relative; z-index:3;}
@@ -617,6 +625,10 @@
       <div class="hero-line">
         <h1 data-en="Where to today?">وين رح ناخدك اليوم؟</h1>
         <p data-en="Plan smarter — from the first idea to the last detail">خطط رحلتك بذكاء… من أول فكرة لحد آخر تفصيلة</p>
+        <div class="trip-mode-pill" id="tripModePill">
+          <i data-lucide="waves"></i>
+          <span data-en="Leisure mode">وضع سياحة وترفيه</span>
+        </div>
       </div>
     </div>
 
@@ -630,10 +642,10 @@
           <span class="link" data-en="New filter">فلتر جديد</span>
         </div>
         <div class="filter-row">
-          <div class="chip active"><i data-lucide="waves"></i><span data-en="Beach">بحرية</span></div>
-          <div class="chip"><i data-lucide="mountain-snow"></i><span data-en="Mountain">جبلية</span></div>
-          <div class="chip"><i data-lucide="briefcase"></i><span data-en="Business">عمل</span></div>
-          <div class="chip"><i data-lucide="landmark"></i><span data-en="Culture">ثقافية</span></div>
+          <div class="chip active" data-trip-type="leisure"><i data-lucide="waves"></i><span data-en="Beach">بحرية</span></div>
+          <div class="chip" data-trip-type="mountain"><i data-lucide="mountain-snow"></i><span data-en="Mountain">جبلية</span></div>
+          <div class="chip" data-trip-type="business"><i data-lucide="briefcase"></i><span data-en="Business">عمل</span></div>
+          <div class="chip" data-trip-type="culture"><i data-lucide="landmark"></i><span data-en="Culture">ثقافية</span></div>
         </div>
         <div class="budget-track"><div class="budget-fill"></div></div>
         <div class="budget-labels"><span data-en="Economy">اقتصادي</span><span data-en="Budget">الميزانية</span><span data-en="Luxury">فاخر</span></div>
@@ -646,7 +658,7 @@
         <span class="link" data-en="See all">عرض الكل</span>
       </div>
       <div class="dest-scroll">
-        <div class="dest-card">
+        <div class="dest-card" data-trip-type="mountain">
           <div class="dest-img" style="background:linear-gradient(135deg,#0071C2,#003580)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
             <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 5س 20د</span>
@@ -657,7 +669,7 @@
             <div class="dest-tags"><span class="tag" data-en="Adventure">مغامرات</span><span class="tag" data-en="Coastal">بحري</span></div>
           </div>
         </div>
-        <div class="dest-card">
+        <div class="dest-card" data-trip-type="culture">
           <div class="dest-img" style="background:linear-gradient(135deg,#0090D9,#003580)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
             <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 3س 40د</span>
@@ -668,7 +680,7 @@
             <div class="dest-tags"><span class="tag" data-en="Culture">ثقافية</span><span class="tag" data-en="Halal">حلال</span></div>
           </div>
         </div>
-        <div class="dest-card">
+        <div class="dest-card" data-trip-type="leisure">
           <div class="dest-img" style="background:linear-gradient(135deg,#003580,#001B40)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
             <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 2س 10د</span>
@@ -684,9 +696,9 @@
       <!-- Mode dashboard -->
       <div class="section-title"><h2 data-en="Your trip dashboard">لوحة رحلتك</h2></div>
       <div class="mode-tabs">
-        <div class="mode-tab active" data-en="Leisure">سياحة</div>
-        <div class="mode-tab" data-en="Business">عمل</div>
-        <div class="mode-tab" data-en="Culture / Study">ثقافة / تعليم</div>
+        <div class="mode-tab active" data-en="Leisure" data-trip-type="leisure">سياحة</div>
+        <div class="mode-tab" data-en="Business" data-trip-type="business">عمل</div>
+        <div class="mode-tab" data-en="Culture / Study" data-trip-type="culture">ثقافة / تعليم</div>
       </div>
 
       <div style="margin-top:14px">
@@ -1133,17 +1145,110 @@
     item.addEventListener('click', ()=> goToScreen(item.dataset.screen));
   });
 
-  // Tap a destination card to open its detail screen
+  // ---------- Dynamic trip-type theming ----------
+  // Each "trip type" carries its own color palette (applied as CSS custom
+  // properties, which every component already reads from), a badge icon,
+  // and localized hero copy. Colors cascade automatically to the header,
+  // buttons, chips, prices, etc. since they're all built on these vars.
+  const TRIP_THEMES = {
+    leisure:{
+      vars:{'--deep-navy':'#003580','--ocean':'#0071C2','--turquoise':'#FEBB02','--seafoam':'#E4F0FB','--coral':'#EB2026'},
+      icon:'waves',
+      heroAr:'وين رح ناخدك اليوم؟', heroEn:'Where to today?',
+      subAr:'خطط رحلتك بذكاء… من أول فكرة لحد آخر تفصيلة', subEn:'Plan smarter — from the first idea to the last detail',
+      labelAr:'وضع سياحة وترفيه', labelEn:'Leisure mode'
+    },
+    mountain:{
+      vars:{'--deep-navy':'#16302A','--ocean':'#3E7C59','--turquoise':'#D9A441','--seafoam':'#E7F1E9','--coral':'#C1502E'},
+      icon:'mountain-snow',
+      heroAr:'وجهتك الجبلية الجاية؟', heroEn:'Your next mountain escape?',
+      subAr:'مسارات ومغامرات وطبيعة… خطط رحلتك للقمم', subEn:'Trails, adventure, and nature — plan your peak escape',
+      labelAr:'وضع مغامرات جبلية', labelEn:'Mountain mode'
+    },
+    business:{
+      vars:{'--deep-navy':'#10151F','--ocean':'#33465E','--turquoise':'#C9A227','--seafoam':'#E7E9EE','--coral':'#B3541E'},
+      icon:'briefcase',
+      heroAr:'رحلة عملك الجاية؟', heroEn:'Your next business trip?',
+      subAr:'فنادق قريبة من مقرك، اجتماعات، ولوجستيات بذكاء', subEn:'Hotels near your office, meetings, and smart logistics',
+      labelAr:'وضع رحلة عمل', labelEn:'Business mode'
+    },
+    culture:{
+      vars:{'--deep-navy':'#3A2145','--ocean':'#7A3B63','--turquoise':'#D4A24C','--seafoam':'#F1E7ED','--coral':'#B5384A'},
+      icon:'landmark',
+      heroAr:'وجهتك الثقافية الجاية؟', heroEn:'Your next cultural journey?',
+      subAr:'متاحف وتاريخ وتجارب أصيلة… اكتشف القصة', subEn:'Museums, history, and authentic experiences — discover the story',
+      labelAr:'وضع ثقافة وتعليم', labelEn:'Culture mode'
+    }
+  };
+
+  let currentTripType = 'leisure';
+  let tripTypeManual = false; // true once the user explicitly picks a type
+
+  function setLocalizedText(el, ar, en){
+    if(!el) return;
+    el.setAttribute('data-en', en);
+    el.dataset.arCache = ar;
+    el.textContent = currentLang === 'ar' ? ar : en;
+  }
+
+  function applyTripTheme(type){
+    const theme = TRIP_THEMES[type] || TRIP_THEMES.leisure;
+    Object.entries(theme.vars).forEach(([k,v])=> document.documentElement.style.setProperty(k, v));
+    document.documentElement.setAttribute('data-trip', type);
+    currentTripType = type;
+
+    const badgeIcon = document.querySelector('#screen-home .brand-badge i');
+    if(badgeIcon) badgeIcon.setAttribute('data-lucide', theme.icon);
+
+    setLocalizedText(document.querySelector('#screen-home .hero-line h1'), theme.heroAr, theme.heroEn);
+    setLocalizedText(document.querySelector('#screen-home .hero-line p'), theme.subAr, theme.subEn);
+
+    const pill = document.getElementById('tripModePill');
+    if(pill){
+      pill.querySelector('i').setAttribute('data-lucide', theme.icon);
+      setLocalizedText(pill.querySelector('span'), theme.labelAr, theme.labelEn);
+    }
+
+    lucide.createIcons();
+  }
+
+  function syncTripTypeControls(type){
+    document.querySelectorAll('.filter-row .chip').forEach(c=>{
+      c.classList.toggle('active', c.dataset.tripType === type);
+    });
+    document.querySelectorAll('#screen-home > .content > .mode-tabs .mode-tab[data-trip-type]').forEach(t=>{
+      t.classList.toggle('active', t.dataset.tripType === type);
+    });
+  }
+
+  function setTripType(type, manual){
+    if(manual) tripTypeManual = true;
+    applyTripTheme(type);
+    syncTripTypeControls(type);
+  }
+  window.setTripType = setTripType;
+
+  // Tap a destination card to open its detail screen — auto-switches the
+  // app theme to match that destination's nature, unless the user has
+  // already picked a trip type manually this session.
   document.querySelectorAll('.dest-card').forEach(card=>{
-    card.addEventListener('click', ()=> goToScreen('screen-detail'));
+    card.addEventListener('click', ()=>{
+      if(!tripTypeManual && card.dataset.tripType){
+        setTripType(card.dataset.tripType, false);
+      }
+      goToScreen('screen-detail');
+    });
   });
 
-  // Generic tab toggles (mode-tabs)
+  // Generic tab toggles (mode-tabs) — the home dashboard's Leisure/Business/
+  // Culture tabs also drive the trip theme; other mode-tabs (detail screen,
+  // trip screen) are unaffected since they carry no data-trip-type.
   document.querySelectorAll('.mode-tabs').forEach(group=>{
     group.querySelectorAll('.mode-tab').forEach(tab=>{
       tab.addEventListener('click', ()=>{
         group.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
         tab.classList.add('active');
+        if(tab.dataset.tripType) setTripType(tab.dataset.tripType, true);
       });
     });
   });
@@ -1152,6 +1257,7 @@
     chip.addEventListener('click', ()=>{
       chip.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
       chip.classList.add('active');
+      if(chip.dataset.tripType) setTripType(chip.dataset.tripType, true);
     });
   });
 
