@@ -205,6 +205,7 @@
     background:var(--seafoam); color:var(--ocean);
   }
   .list-icon.coral{background:#FBE7E7; color:var(--coral);}
+  .list-icon.gold{background:color-mix(in srgb, var(--turquoise) 18%, white); color:var(--turquoise);}
   .list-text h4{font-size:13px; margin:0 0 2px; color:var(--ink);}
   .list-text span{font-size:10.5px; color:var(--ink-soft);}
   .list-meta{margin-inline-start:auto; text-align:end;}
@@ -239,6 +240,45 @@
     font-family:'Tajawal',sans-serif; font-size:13px; color:var(--ink);
   }
   .search-bar svg{color:var(--ocean); flex-shrink:0;}
+
+  /* Search: category filter chips (multi-select) */
+  .filter-chip-row{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px;}
+  .filter-chip{
+    display:flex; align-items:center; gap:6px;
+    padding:8px 13px; border-radius:20px; font-size:11.5px; font-weight:700;
+    background:var(--sand); color:var(--ink-soft); border:1.5px solid transparent;
+    cursor:pointer;
+  }
+  .filter-chip svg{width:14px; height:14px;}
+  .filter-chip.active{
+    background:linear-gradient(135deg,var(--ocean),var(--deep-navy));
+    color:#fff; border-color:transparent;
+    box-shadow:0 6px 14px -8px rgba(0,53,128,.5);
+  }
+
+  /* Search: budget range filter */
+  .budget-filter-card{padding:14px 16px; margin-bottom:14px;}
+  .budget-filter-head{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:8px; font-size:12.5px; font-weight:700; color:var(--ink);
+  }
+  .budget-filter-head b{color:var(--deep-navy); font-family:'Cairo',sans-serif; font-size:14.5px;}
+  .budget-range{
+    width:100%; -webkit-appearance:none; appearance:none;
+    height:8px; border-radius:20px; outline:none;
+    background:linear-gradient(90deg,var(--turquoise),var(--coral));
+    margin:6px 0 6px;
+  }
+  .budget-range::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:20px; height:20px; border-radius:50%;
+    background:#fff; border:3px solid var(--deep-navy);
+    box-shadow:0 4px 10px -2px rgba(10,61,82,.4); cursor:pointer;
+  }
+  .budget-range::-moz-range-thumb{
+    width:20px; height:20px; border-radius:50%; border:3px solid var(--deep-navy);
+    background:#fff; box-shadow:0 4px 10px -2px rgba(10,61,82,.4); cursor:pointer;
+  }
 
   /* Booking Hub */
   .booking-search-row{display:flex; gap:8px; margin-bottom:14px;}
@@ -1023,28 +1063,50 @@
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
           <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
-          <div class="icon-btn"><i data-lucide="sliders-horizontal" width="17" height="17"></i></div>
+          <div class="icon-btn" onclick="resetSearchFilters()" title="Reset filters"><i data-lucide="sliders-horizontal" width="17" height="17"></i></div>
         </div>
       </div>
     </div>
     <div class="content" style="margin-top:-18px">
       <div class="search-bar">
         <i data-lucide="search" width="17" height="17"></i>
-        <input type="text" id="searchInput" value="أفضل مطعم حلال في شارع الشانزليزيه" data-en-value="best halal restaurant on Champs-Élysées" readonly>
+        <input type="text" id="searchInput" placeholder="اكتب اسم منطقة أو حي…" data-en-placeholder="Type a region or district…" oninput="renderSearchResults()">
       </div>
-      <div class="map-canvas">
+
+      <!-- Search scope: continent / country / region / street -->
+      <div class="mode-tabs" id="searchScopeTabs" style="margin-bottom:14px;">
+        <div class="mode-tab" data-scope="continent" data-en="Continent">قارة</div>
+        <div class="mode-tab" data-scope="country" data-en="Country">دولة</div>
+        <div class="mode-tab active" data-scope="region" data-en="Region">منطقة</div>
+        <div class="mode-tab" data-scope="street" data-en="Street">شارع</div>
+      </div>
+
+      <!-- Category filters (multi-select) -->
+      <div class="filter-chip-row" id="searchCategoryChips">
+        <div class="filter-chip active" data-cat="restaurant"><i data-lucide="utensils-crossed"></i><span data-en="Restaurants">مطاعم</span></div>
+        <div class="filter-chip active" data-cat="hotel"><i data-lucide="bed-double"></i><span data-en="Hotels">فنادق</span></div>
+        <div class="filter-chip active" data-cat="supermarket"><i data-lucide="shopping-basket"></i><span data-en="Supermarkets">سوبرماركت</span></div>
+        <div class="filter-chip active" data-cat="clothing"><i data-lucide="shirt"></i><span data-en="Clothing">ألبسة</span></div>
+        <div class="filter-chip active" data-cat="gifts"><i data-lucide="gift"></i><span data-en="Gifts">هدايا</span></div>
+      </div>
+
+      <!-- Budget filter -->
+      <div class="filter-card budget-filter-card">
+        <div class="budget-filter-head">
+          <span data-en="Max budget per item">أقصى ميزانية للعنصر</span>
+          <b id="searchBudgetValue">$150</b>
+        </div>
+        <input type="range" class="budget-range" id="searchBudgetSlider" min="10" max="150" step="5" value="150">
+        <div class="budget-labels"><span data-en="Economy">اقتصادي</span><span data-en="Luxury">فاخر</span></div>
+      </div>
+
+      <div class="map-canvas" id="searchMapCanvas">
         <div class="map-grid"></div>
         <div class="map-road" style="top:38%; left:0; right:0; height:6px;"></div>
         <div class="map-road" style="top:0; bottom:0; left:55%; width:6px;"></div>
 
         <div class="map-pin user-pin" style="top:56%; left:50%;"><span class="pulse"></span></div>
 
-        <div class="map-pin poi-pin coral" data-name="مطعم الشام" data-name-en="Al Sham Restaurant" data-dist="320م" data-dist-en="320m" style="top:30%; left:63%;">
-          <i data-lucide="utensils-crossed" width="13" height="13"></i>
-        </div>
-        <div class="map-pin poi-pin coral" data-name="Le Bosphore" data-name-en="Le Bosphore" data-dist="600م" data-dist-en="600m" style="top:70%; left:70%;">
-          <i data-lucide="utensils-crossed" width="13" height="13"></i>
-        </div>
         <div class="map-pin poi-pin ocean" data-name="مسجد الفتح" data-name-en="Al-Fath Mosque" data-dist="310م" data-dist-en="310m" style="top:66%; left:28%;">
           <i data-lucide="landmark" width="13" height="13"></i>
         </div>
@@ -1057,22 +1119,12 @@
           <small class="tooltip-dist"></small>
         </div>
       </div>
-      <div class="section-title" style="margin-top:0"><h2 data-en="3 matching results">3 نتائج مطابقة</h2></div>
-      <div class="list-item">
-        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Al Sham Restaurant">مطعم الشام</h4><span data-en="Halal · Levantine cuisine">حلال · مطبخ شامي</span></div>
-        <div class="list-meta"><b>4.7★</b><small data-en="320m">320م</small></div>
+
+      <div class="section-title" style="margin-top:0">
+        <h2 id="searchResultsTitle" data-en="11 matching results">11 نتيجة مطابقة</h2>
+        <span class="link" id="searchBudgetEstimate"></span>
       </div>
-      <div class="list-item">
-        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Le Bosphore</h4><span data-en="Halal · Seafood">حلال · مأكولات بحرية</span></div>
-        <div class="list-meta"><b>4.5★</b><small data-en="600m">600م</small></div>
-      </div>
-      <div class="list-item">
-        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Anatolia Grill</h4><span data-en="Halal · Grill">حلال · شواء</span></div>
-        <div class="list-meta"><b>4.4★</b><small data-en="850m">850م</small></div>
-      </div>
+      <div id="searchResultsList"></div>
     </div>
   </div>
 
@@ -1542,7 +1594,7 @@
   window.toggleTheme = toggleTheme;
 
   // Interactive map pins
-  document.querySelectorAll('.map-pin.poi-pin').forEach(pin=>{
+  function bindPoiPin(pin){
     pin.addEventListener('click', ()=>{
       const canvas = pin.closest('.map-canvas');
       const tooltip = canvas.querySelector('.map-tooltip');
@@ -1552,7 +1604,155 @@
       tooltip.querySelector('.tooltip-dist').textContent = dist;
       tooltip.classList.add('show');
     });
+  }
+  document.querySelectorAll('.map-pin.poi-pin').forEach(bindPoiPin);
+
+  // ---------- Smart Search: scope, category filters, budget, results ----------
+  const SEARCH_POIS = [
+    {id:'r1', cat:'restaurant', name:'مطعم الشام', nameEn:'Al Sham Restaurant', desc:'حلال · مطبخ شامي', descEn:'Halal · Levantine cuisine', rating:4.7, dist:'320م', distEn:'320m', price:12, top:30, left:63},
+    {id:'r2', cat:'restaurant', name:'Le Bosphore', nameEn:'Le Bosphore', desc:'حلال · مأكولات بحرية', descEn:'Halal · Seafood', rating:4.5, dist:'600م', distEn:'600m', price:28, top:78, left:70},
+    {id:'r3', cat:'restaurant', name:'Anatolia Grill', nameEn:'Anatolia Grill', desc:'حلال · شواء', descEn:'Halal · Grill', rating:4.4, dist:'850م', distEn:'850m', price:9, top:88, left:40},
+    {id:'h1', cat:'hotel', name:'فندق لو ماريه', nameEn:'Le Marais Hotel', desc:'4 نجوم · قريب من المترو', descEn:'4-star · Near metro', rating:4.6, dist:'450م', distEn:'450m', price:140, top:45, left:15, unit:'night'},
+    {id:'h2', cat:'hotel', name:'Hôtel de Ville Suites', nameEn:'Hôtel de Ville Suites', desc:'بوتيك · إفطار مجاني', descEn:'Boutique · Free breakfast', rating:4.3, dist:'900م', distEn:'900m', price:95, top:12, left:52, unit:'night'},
+    {id:'s1', cat:'supermarket', name:'سوبرماركت حلال إكسبريس', nameEn:'Halal Market Express', desc:'لحوم وذبائح موثقة', descEn:'Certified halal meat & goods', rating:4.6, dist:'500م', distEn:'500m', price:18, top:58, left:85},
+    {id:'s2', cat:'supermarket', name:'Monoprix Champs', nameEn:'Monoprix Champs', desc:'سوبرماركت عام', descEn:'General supermarket', rating:4.1, dist:'700م', distEn:'700m', price:22, top:6, left:32},
+    {id:'c1', cat:'clothing', name:'غاليري لافاييت', nameEn:'Galeries Lafayette', desc:'أزياء وماركات عالمية', descEn:'Fashion & global brands', rating:4.5, dist:'1.1كم', distEn:'1.1km', price:65, top:22, left:78},
+    {id:'c2', cat:'clothing', name:'Zara Champs-Élysées', nameEn:'Zara Champs-Élysées', desc:'أزياء عصرية', descEn:'Contemporary fashion', rating:4.2, dist:'400م', distEn:'400m', price:24, top:90, left:60},
+    {id:'g1', cat:'gifts', name:'متجر هدايا باريس', nameEn:'Paris Gift Boutique', desc:'تذكارات وهدايا مميزة', descEn:'Souvenirs & keepsakes', rating:4.4, dist:'350م', distEn:'350m', price:15, top:10, left:10},
+    {id:'g2', cat:'gifts', name:'La Parfumerie', nameEn:'La Parfumerie', desc:'عطور وهدايا فاخرة', descEn:'Perfume & luxury gifts', rating:4.6, dist:'620م', distEn:'620m', price:38, top:68, left:10}
+  ];
+
+  const SEARCH_CATEGORY_META = {
+    restaurant:{icon:'utensils-crossed', pinColor:'coral'},
+    hotel:{icon:'bed-double', pinColor:'ocean'},
+    supermarket:{icon:'shopping-basket', pinColor:'gold'},
+    clothing:{icon:'shirt', pinColor:'gold'},
+    gifts:{icon:'gift', pinColor:'gold'}
+  };
+
+  const SEARCH_SCOPE_PLACEHOLDERS = {
+    continent:{ar:'اكتب اسم قارة… مثل أوروبا', en:'Type a continent… e.g. Europe'},
+    country:{ar:'اكتب اسم دولة… مثل فرنسا', en:'Type a country… e.g. France'},
+    region:{ar:'اكتب اسم منطقة أو حي…', en:'Type a region or district…'},
+    street:{ar:'اكتب اسم شارع… مثل الشانزليزيه', en:'Type a street… e.g. Champs-Élysées'}
+  };
+
+  function setSearchScope(scope){
+    document.querySelectorAll('#searchScopeTabs .mode-tab').forEach(t=>{
+      t.classList.toggle('active', t.dataset.scope === scope);
+    });
+    const input = document.getElementById('searchInput');
+    const ph = SEARCH_SCOPE_PLACEHOLDERS[scope] || SEARCH_SCOPE_PLACEHOLDERS.region;
+    if(input){
+      input.setAttribute('data-en-placeholder', ph.en);
+      input.dataset.arPlaceholderCache = ph.ar;
+      input.setAttribute('placeholder', currentLang === 'ar' ? ph.ar : ph.en);
+    }
+  }
+  window.setSearchScope = setSearchScope;
+
+  document.querySelectorAll('#searchScopeTabs .mode-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=> setSearchScope(tab.dataset.scope));
   });
+
+  document.querySelectorAll('.filter-chip[data-cat]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      chip.classList.toggle('active');
+      renderSearchResults();
+    });
+  });
+
+  const searchBudgetSlider = document.getElementById('searchBudgetSlider');
+  if(searchBudgetSlider){
+    searchBudgetSlider.addEventListener('input', ()=>{
+      document.getElementById('searchBudgetValue').textContent = '$' + searchBudgetSlider.value;
+      renderSearchResults();
+    });
+  }
+
+  function renderSearchResults(){
+    const activeCats = Array.from(document.querySelectorAll('.filter-chip[data-cat].active')).map(c=>c.dataset.cat);
+    const maxBudget = Number(document.getElementById('searchBudgetSlider').value);
+    const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+    const filtered = SEARCH_POIS.filter(poi=>{
+      if(!activeCats.includes(poi.cat)) return false;
+      if(poi.price > maxBudget) return false;
+      if(query){
+        const hay = (poi.name + ' ' + poi.nameEn + ' ' + poi.desc + ' ' + poi.descEn).toLowerCase();
+        if(!hay.includes(query)) return false;
+      }
+      return true;
+    });
+
+    const listEl = document.getElementById('searchResultsList');
+    if(!filtered.length){
+      listEl.innerHTML = '<div class="booking-state"><i data-lucide="search-x" width="24" height="24"></i><span>' +
+        (currentLang === 'ar' ? 'ما لقينا نتائج مطابقة، جرّب توسيع الميزانية أو الفلاتر' : 'No matching results — try widening your budget or filters') +
+        '</span></div>';
+    } else {
+      listEl.innerHTML = filtered.map(poi=>{
+        const meta = SEARCH_CATEGORY_META[poi.cat];
+        const listClass = meta.pinColor === 'ocean' ? '' : meta.pinColor;
+        const unitAr = poi.unit === 'night' ? '/ليلة' : '';
+        const unitEn = poi.unit === 'night' ? '/night' : '';
+        return '<div class="list-item">' +
+          '<div class="list-icon ' + listClass + '"><i data-lucide="' + meta.icon + '" width="19" height="19"></i></div>' +
+          '<div class="list-text"><h4>' + (currentLang === 'ar' ? poi.name : poi.nameEn) + '</h4><span>' + (currentLang === 'ar' ? poi.desc : poi.descEn) + ' · ' + poi.rating + '★</span></div>' +
+          '<div class="list-meta"><b>$' + poi.price + (currentLang === 'ar' ? unitAr : unitEn) + '</b><small>' + (currentLang === 'ar' ? poi.dist : poi.distEn) + '</small></div>' +
+        '</div>';
+      }).join('');
+    }
+
+    const canvas = document.getElementById('searchMapCanvas');
+    const tooltip = canvas.querySelector('.map-tooltip');
+    canvas.querySelectorAll('.map-pin.poi-pin[data-poi]').forEach(p=>p.remove());
+    filtered.forEach(poi=>{
+      const meta = SEARCH_CATEGORY_META[poi.cat];
+      const pin = document.createElement('div');
+      pin.className = 'map-pin poi-pin ' + meta.pinColor;
+      pin.dataset.poi = poi.id;
+      pin.dataset.name = poi.name;
+      pin.dataset.nameEn = poi.nameEn;
+      pin.dataset.dist = poi.dist;
+      pin.dataset.distEn = poi.distEn;
+      pin.style.top = poi.top + '%';
+      pin.style.left = poi.left + '%';
+      pin.innerHTML = '<i data-lucide="' + meta.icon + '" width="13" height="13"></i>';
+      canvas.insertBefore(pin, tooltip);
+      bindPoiPin(pin);
+    });
+
+    setLocalizedText(document.getElementById('searchResultsTitle'),
+      filtered.length + ' ' + (filtered.length === 1 ? 'نتيجة مطابقة' : 'نتائج مطابقة'),
+      filtered.length + ' matching ' + (filtered.length === 1 ? 'result' : 'results')
+    );
+
+    const estEl = document.getElementById('searchBudgetEstimate');
+    if(filtered.length){
+      const prices = filtered.map(p=>p.price);
+      setLocalizedText(estEl,
+        'الميزانية المقدّرة: $' + Math.min(...prices) + ' – $' + Math.max(...prices),
+        'Est. budget: $' + Math.min(...prices) + ' – $' + Math.max(...prices)
+      );
+    } else {
+      setLocalizedText(estEl, '', '');
+    }
+
+    lucide.createIcons();
+  }
+  window.renderSearchResults = renderSearchResults;
+
+  function resetSearchFilters(){
+    document.getElementById('searchInput').value = '';
+    document.querySelectorAll('.filter-chip[data-cat]').forEach(c=>c.classList.add('active'));
+    const slider = document.getElementById('searchBudgetSlider');
+    slider.value = slider.max;
+    document.getElementById('searchBudgetValue').textContent = '$' + slider.max;
+    setSearchScope('region');
+    renderSearchResults();
+  }
+  window.resetSearchFilters = resetSearchFilters;
 
   function goToScreen(screenId){
     document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
@@ -2574,6 +2774,7 @@
   // English is now the app's primary/default language.
   applyLang('en');
   populateCountrySelects();
+  renderSearchResults();
 
 </script>
 </body>
