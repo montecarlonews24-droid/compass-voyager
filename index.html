@@ -437,14 +437,26 @@
   .hotel-card-img{
     width:96px; flex-shrink:0; background:linear-gradient(135deg,var(--ocean),var(--deep-navy));
     background-size:cover; background-position:center;
-    display:flex; align-items:flex-end; padding:6px;
+    display:flex; align-items:flex-end; padding:6px; position:relative; cursor:pointer;
+  }
+  .hotel-card-img-count{
+    background:rgba(0,0,0,.55); color:#fff; font-size:8.5px; font-weight:700;
+    padding:2px 6px; border-radius:8px; display:flex; align-items:center; gap:3px;
   }
   .hotel-card-body{padding:10px 12px; flex:1; min-width:0;}
   .hotel-card-body h4{font-size:13px; margin:0 0 4px; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .hotel-card-stars{display:flex; gap:1px; color:var(--turquoise); margin-bottom:3px;}
   .hotel-card-rating{display:flex; align-items:center; gap:4px; font-size:10.5px; color:var(--ink-soft); margin-bottom:6px;}
   .hotel-card-rating svg{color:var(--turquoise); width:12px; height:12px;}
   .hotel-card-price{font-family:'Cairo',sans-serif; font-weight:800; font-size:14px; color:var(--deep-navy);}
   .hotel-card-price span{font-size:9.5px; color:var(--ink-soft); font-weight:600; margin-inline-start:4px;}
+
+  .airport-icon{position:relative;}
+  .airport-flag-badge{
+    position:absolute; bottom:-3px; inset-inline-end:-3px; font-size:11px;
+    background:var(--foam); border-radius:50%; width:16px; height:16px;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 2px var(--foam);
+  }
 
   /* Sign-up screen */
   .social-btn{
@@ -2908,10 +2920,55 @@
     return (p && p.propertyImage && p.propertyImage.image && p.propertyImage.image.url) || '';
   }
 
+  // Most search-result responses only carry one representative photo per
+  // property (full galleries live in a separate Content API call). We check
+  // a few plausible array shapes so the UI upgrades itself automatically if
+  // the connected API ever returns more than one image.
+  function extractHotelImages(p){
+    if(Array.isArray(p && p.images) && p.images.length){
+      const urls = p.images.map(im => (im && (im.url || (im.image && im.image.url))) || (typeof im === 'string' ? im : '')).filter(Boolean);
+      if(urls.length) return urls;
+    }
+    if(Array.isArray(p && p.propertyImage) && p.propertyImage.length){
+      const urls = p.propertyImage.map(im => im && im.image && im.image.url).filter(Boolean);
+      if(urls.length) return urls;
+    }
+    const single = extractHotelImage(p);
+    return single ? [single] : [];
+  }
+
   function extractHotelRating(p){
     const score = p && p.reviews && p.reviews.score;
     return score ? Number(score).toFixed(1) : null;
   }
+
+  // Official hotel star class (1-5), distinct from the guest review score above.
+  function extractHotelStarClass(p){
+    const raw = p && (p.star || p.starRating || (p.category && p.category.star) || (p.category && p.category.name));
+    const n = Math.round(Number(raw));
+    return (n >= 1 && n <= 5) ? n : null;
+  }
+
+  function renderHotelStars(n){
+    if(!n) return '';
+    let html = '<div class="hotel-card-stars">';
+    for(let i=1; i<=5; i++){
+      html += '<i data-lucide="star" width="11" height="11"' + (i <= n ? ' fill="currentColor"' : '') + '></i>';
+    }
+    return html + '</div>';
+  }
+
+  function cycleHotelImage(el){
+    let images = [];
+    try{ images = JSON.parse(el.dataset.images || '[]'); }catch(e){}
+    if(images.length < 2) return;
+    const idx = (Number(el.dataset.idx || 0) + 1) % images.length;
+    el.dataset.idx = idx;
+    el.style.backgroundImage = "url('" + images[idx] + "')";
+    const counter = el.querySelector('.hotel-card-img-count span');
+    if(counter) counter.textContent = (idx + 1) + '/' + images.length;
+  }
+  window.cycleHotelImage = cycleHotelImage;
 
   async function searchHotelPrices(){
     if(!bookingSelectedDestination || !bookingSelectedDestination.regionId){
@@ -2974,12 +3031,17 @@
           const name = (p.name) || (currentLang === 'ar' ? 'فندق' : 'Hotel');
           const price = extractHotelPrice(p);
           const rating = extractHotelRating(p);
-          const image = extractHotelImage(p);
-          const imgStyle = image ? ' style="background-image:url(\'' + image + '\')"' : '';
+          const starClass = extractHotelStarClass(p);
+          const images = extractHotelImages(p);
+          const imgStyle = images[0] ? ' style="background-image:url(\'' + images[0] + '\')"' : '';
+          const imgCount = images.length > 1
+            ? '<span class="hotel-card-img-count"><i data-lucide="image" width="9" height="9"></i><span>1/' + images.length + '</span></span>'
+            : '';
           return '<div class="hotel-card">' +
-            '<div class="hotel-card-img"' + imgStyle + '></div>' +
+            '<div class="hotel-card-img"' + imgStyle + ' data-images=\'' + JSON.stringify(images) + '\' data-idx="0" onclick="cycleHotelImage(this)">' + imgCount + '</div>' +
             '<div class="hotel-card-body">' +
               '<h4>' + name + '</h4>' +
+              renderHotelStars(starClass) +
               (rating ? '<div class="hotel-card-rating"><i data-lucide="star" width="12" height="12"></i><span>' + rating + '</span></div>' : '') +
               '<div class="hotel-card-price">' + (price || (currentLang === 'ar' ? 'السعر غير متاح' : 'Price unavailable')) +
                 (price ? '<span data-en="/night">/ليلة</span>' : '') +
@@ -3071,8 +3133,11 @@
       box.innerHTML = flightAirportResults.map((r, i)=>{
         const title = (r.presentation && r.presentation.title) || '';
         const subtitle = (r.presentation && r.presentation.subtitle) || '';
+        const flag = guessAirportFlag(title, subtitle);
         return '<div class="list-item booking-list-item" onclick="selectFlightAirport(' + i + ')">' +
-          '<div class="list-icon booking-result-icon"><i data-lucide="plane" width="19" height="19"></i></div>' +
+          '<div class="list-icon booking-result-icon airport-icon"><i data-lucide="plane" width="19" height="19"></i>' +
+            (flag ? '<span class="airport-flag-badge">' + flag + '</span>' : '') +
+          '</div>' +
           '<div class="list-text"><h4>' + title + '</h4><span>' + subtitle + '</span></div>' +
           '</div>';
       }).join('');
@@ -3083,6 +3148,16 @@
     }
   }
   window.searchFlightAirports = searchFlightAirports;
+
+  // The airport search API doesn't return photos, so we add a small,
+  // honest visual touch instead of faking one: guess the country from the
+  // result text and show its flag, reusing the same country list and flag
+  // helper used elsewhere in the app.
+  function guessAirportFlag(title, subtitle){
+    const hay = (title + ' ' + subtitle).toLowerCase();
+    const match = COUNTRIES.find(c => hay.includes(c.en.toLowerCase()));
+    return match ? countryFlagEmoji(match.code) : '';
+  }
 
   function extractAirportParams(r){
     const nav = r.navigation && r.navigation.relevantFlightParams;
