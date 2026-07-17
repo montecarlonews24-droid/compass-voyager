@@ -198,6 +198,7 @@
     display:flex; align-items:center; gap:12px;
     background:var(--foam); border-radius:16px; padding:12px;
     margin-bottom:10px; box-shadow:0 8px 18px -14px rgba(10,61,82,.25);
+    cursor:pointer;
   }
   .list-icon{
     width:42px;height:42px;border-radius:12px; flex-shrink:0;
@@ -211,6 +212,42 @@
   .list-meta{margin-inline-start:auto; text-align:end;}
   .list-meta b{display:block; font-size:11.5px; color:var(--ocean);}
   .list-meta small{font-size:9.5px; color:var(--ink-soft);}
+
+  /* POI detail sheet */
+  .poi-sheet-backdrop{
+    position:fixed; inset:0; background:rgba(10,20,35,.5); z-index:200;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .poi-sheet-backdrop.show{display:flex;}
+  .poi-sheet{
+    width:100%; max-width:430px; background:var(--foam);
+    border-radius:24px 24px 0 0; padding:0 20px 26px;
+    max-height:82vh; overflow-y:auto;
+    animation:poi-sheet-up .25s ease;
+  }
+  @keyframes poi-sheet-up{ from{transform:translateY(30px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+  .poi-sheet-hero{
+    margin:0 -20px 16px; padding:34px 20px 22px; border-radius:0 0 22px 22px;
+    display:flex; flex-direction:column; align-items:center; gap:10px; color:#fff; text-align:center;
+  }
+  .poi-sheet-hero-icon{
+    width:64px; height:64px; border-radius:50%; background:rgba(255,255,255,.2);
+    display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,.35);
+  }
+  .poi-sheet-close{
+    position:absolute; top:14px; inset-inline-end:14px;
+    width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.25);
+    display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer;
+  }
+  .poi-sheet-stats{display:flex; gap:10px; margin-bottom:16px;}
+  .poi-sheet-stat{flex:1; background:var(--sand); border-radius:14px; padding:10px; text-align:center;}
+  .poi-sheet-stat b{display:block; font-family:'Cairo',sans-serif; font-size:15px; color:var(--ink);}
+  .poi-sheet-stat small{font-size:9.5px; color:var(--ink-soft);}
+  .poi-sheet-note{
+    display:flex; gap:10px; background:var(--seafoam); border-radius:14px; padding:12px;
+    font-size:11px; color:var(--ink); line-height:1.6; margin-bottom:14px;
+  }
+  .poi-sheet-note i{color:var(--ocean); flex-shrink:0; margin-top:1px;}
 
   /* Muslim traveler corner */
   .prayer-strip{
@@ -1477,6 +1514,34 @@
     </div>
   </div>
 
+  <!-- ================= POI DETAIL SHEET ================= -->
+  <div class="poi-sheet-backdrop" id="poiSheetBackdrop" onclick="if(event.target===this) closePoiSheet()">
+    <div class="poi-sheet">
+      <div class="poi-sheet-hero" id="poiSheetHero">
+        <div class="poi-sheet-close" onclick="closePoiSheet()"><i data-lucide="x" width="16" height="16"></i></div>
+        <div class="poi-sheet-hero-icon"><i data-lucide="store" width="28" height="28" id="poiSheetIcon"></i></div>
+        <h3 id="poiSheetName" style="margin:0; font-size:17px;">—</h3>
+        <span id="poiSheetDesc" style="font-size:11.5px; opacity:.9;">—</span>
+      </div>
+
+      <div class="poi-sheet-stats">
+        <div class="poi-sheet-stat"><b id="poiSheetPrice">—</b><small data-en="Price">السعر</small></div>
+        <div class="poi-sheet-stat"><b id="poiSheetRating">—</b><small data-en="Rating">التقييم</small></div>
+        <div class="poi-sheet-stat"><b id="poiSheetDist">—</b><small data-en="Distance">المسافة</small></div>
+      </div>
+
+      <div class="poi-sheet-note">
+        <i data-lucide="info" width="15" height="15"></i>
+        <span data-en="This is an example listing for demo purposes — it isn't linked to real photos yet.">هاد مكان توضيحي (Demo) لعرض آلية الفلترة — مش مربوط بصور حقيقية بعد.</span>
+      </div>
+
+      <button class="cta-btn" id="poiSheetHotelCta" style="display:none;" onclick="closePoiSheet(); goToScreen('screen-booking');">
+        <i data-lucide="bed-double" width="17" height="17"></i>
+        <span data-en="Search real hotels with photos">دور على فنادق حقيقية بصور</span>
+      </button>
+    </div>
+  </div>
+
   <!-- ================= TOAST ================= -->
   <div class="app-toast" id="appToast"><i data-lucide="check-circle-2" width="15" height="15"></i><span id="appToastMsg"></span></div>
 
@@ -1896,7 +1961,7 @@
         const listClass = meta.pinColor === 'ocean' ? '' : meta.pinColor;
         const unitAr = poi.unit === 'night' ? '/ليلة' : '';
         const unitEn = poi.unit === 'night' ? '/night' : '';
-        return '<div class="list-item">' +
+        return '<div class="list-item" onclick="openPoiSheet(\'' + poi.id + '\')">' +
           '<div class="list-icon ' + listClass + '"><i data-lucide="' + meta.icon + '" width="19" height="19"></i></div>' +
           '<div class="list-text"><h4>' + (currentLang === 'ar' ? poi.name : poi.nameEn) + '</h4><span>' + (currentLang === 'ar' ? poi.desc : poi.descEn) + ' · ' + poi.rating + '★</span></div>' +
           '<div class="list-meta"><b>$' + poi.price + (currentLang === 'ar' ? unitAr : unitEn) + '</b><small>' + (currentLang === 'ar' ? poi.dist : poi.distEn) + '</small></div>' +
@@ -1942,6 +2007,32 @@
     lucide.createIcons();
   }
   window.renderSearchResults = renderSearchResults;
+
+  function openPoiSheet(id){
+    const poi = SEARCH_POIS.find(p=>p.id===id);
+    if(!poi) return;
+    const meta = SEARCH_CATEGORY_META[poi.cat];
+    const colorMap = {coral:'var(--coral)', ocean:'var(--ocean)', gold:'var(--turquoise)'};
+    document.getElementById('poiSheetHero').style.background =
+      'linear-gradient(135deg,' + colorMap[meta.pinColor] + ',var(--deep-navy))';
+    document.getElementById('poiSheetIcon').setAttribute('data-lucide', meta.icon);
+    document.getElementById('poiSheetName').textContent = currentLang === 'ar' ? poi.name : poi.nameEn;
+    document.getElementById('poiSheetDesc').textContent = currentLang === 'ar' ? poi.desc : poi.descEn;
+    const unitAr = poi.unit === 'night' ? '/ليلة' : '';
+    const unitEn = poi.unit === 'night' ? '/night' : '';
+    document.getElementById('poiSheetPrice').textContent = '$' + poi.price + (currentLang === 'ar' ? unitAr : unitEn);
+    document.getElementById('poiSheetRating').textContent = poi.rating + '★';
+    document.getElementById('poiSheetDist').textContent = currentLang === 'ar' ? poi.dist : poi.distEn;
+    document.getElementById('poiSheetHotelCta').style.display = poi.cat === 'hotel' ? 'flex' : 'none';
+    document.getElementById('poiSheetBackdrop').classList.add('show');
+    lucide.createIcons();
+  }
+  window.openPoiSheet = openPoiSheet;
+
+  function closePoiSheet(){
+    document.getElementById('poiSheetBackdrop').classList.remove('show');
+  }
+  window.closePoiSheet = closePoiSheet;
 
   function resetSearchFilters(){
     document.getElementById('searchInput').value = '';
