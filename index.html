@@ -1137,18 +1137,6 @@
         </div>
       </div>
 
-      <div class="divider-label" data-en="Recommended operators">شركات موصى بها</div>
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="ship" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Polar Latitude</h4><span data-en="Polar expeditions + signature activities">رحلات قطبية + أنشطة مميزة</span></div>
-        <div class="list-meta"><b data-en="Certified">معتمدة</b><small data-en="Official agency">وكالة رسمية</small></div>
-      </div>
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="compass" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Viva Expeditions</h4><span data-en="Full itinerary planning">جداول سياحية شاملة</span></div>
-        <div class="list-meta"><b data-en="Certified">معتمدة</b><small data-en="Partner agency">وكالة وسيطة</small></div>
-      </div>
-
       <div class="divider-label" data-en="Verified reviews">تقييمات موثقة</div>
       <div id="reviewsList"></div>
       <div class="verify-card" id="verifyCard"></div>
@@ -1301,7 +1289,7 @@
           </a>
         </div>
 
-        <p class="country-info-note" data-en="Time is live · population, area, and temperature are typical figures · verify emergency and embassy numbers with an official source before you travel">الوقت مباشر · عدد السكان والمساحة والحرارة أرقام تقريبية نموذجية · تأكد من أرقام الطوارئ والسفارة عبر مصدر رسمي قبل السفر</p>
+        <p class="country-info-note" data-en="Live data from REST Countries &amp; Open-Meteo · verify emergency and embassy numbers with an official source before you travel">بيانات حية من REST Countries و Open-Meteo · تأكد من أرقام الطوارئ والسفارة عبر مصدر رسمي قبل السفر</p>
       </div>
 
       <!-- Category filters (multi-select) -->
@@ -1313,39 +1301,9 @@
         <div class="filter-chip active" data-cat="gifts"><i data-lucide="gift"></i><span data-en="Gifts">هدايا</span></div>
       </div>
 
-      <!-- Budget filter -->
-      <div class="filter-card budget-filter-card">
-        <div class="budget-filter-head">
-          <span data-en="Max budget per item">أقصى ميزانية للعنصر</span>
-          <b id="searchBudgetValue">$150</b>
-        </div>
-        <input type="range" class="budget-range" id="searchBudgetSlider" min="10" max="150" step="5" value="150">
-        <div class="budget-labels"><span data-en="Economy">اقتصادي</span><span data-en="Luxury">فاخر</span></div>
-      </div>
-
-      <div class="map-canvas" id="searchMapCanvas">
-        <div class="map-grid"></div>
-        <div class="map-road" style="top:38%; left:0; right:0; height:6px;"></div>
-        <div class="map-road" style="top:0; bottom:0; left:55%; width:6px;"></div>
-
-        <div class="map-pin user-pin" style="top:56%; left:50%;"><span class="pulse"></span></div>
-
-        <div class="map-pin poi-pin ocean" data-name="مسجد الفتح" data-name-en="Al-Fath Mosque" data-dist="310م" data-dist-en="310m" style="top:66%; left:28%;">
-          <i data-lucide="landmark" width="13" height="13"></i>
-        </div>
-        <div class="map-pin poi-pin gold" data-name="برج إيفل" data-name-en="Eiffel Tower" data-dist="1.2كم" data-dist-en="1.2km" style="top:20%; left:22%;">
-          <i data-lucide="camera" width="13" height="13"></i>
-        </div>
-
-        <div class="map-tooltip" id="mapTooltipSearch">
-          <span class="tooltip-name"></span>
-          <small class="tooltip-dist"></small>
-        </div>
-      </div>
-
       <div class="section-title" style="margin-top:0">
-        <h2 id="searchResultsTitle" data-en="11 matching results">11 نتيجة مطابقة</h2>
-        <span class="link" id="searchBudgetEstimate" style="cursor:default;"></span>
+        <h2 id="searchResultsTitle" data-en="Type a place to search">اكتب مكان للبحث</h2>
+        <span class="link" id="searchSourceNote" style="cursor:default; font-size:9.5px;" data-en="Source: OpenStreetMap">المصدر: OpenStreetMap</span>
       </div>
       <div id="searchResultsList"></div>
     </div>
@@ -1359,49 +1317,37 @@
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
           <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
-          <div class="icon-btn" onclick="goToScreen('screen-search')"><i data-lucide="map-pin" width="17" height="17"></i></div>
         </div>
       </div>
     </div>
     <div class="content" style="margin-top:-18px">
-      <div class="prayer-strip">
+      <div class="search-bar">
+        <i data-lucide="map-pin" width="17" height="17"></i>
+        <input type="text" id="muslimLocationInput" placeholder="اكتب مدينتك الحالية…" data-en-placeholder="Type your current city…" oninput="renderMuslimCorner()">
+      </div>
+
+      <div class="prayer-strip" id="prayerStrip" style="display:none;">
         <div class="list-icon" style="background:rgba(255,255,255,.16); color:#fff;">
           <i data-lucide="moon-star" width="19" height="19"></i>
         </div>
         <div class="next">
-          <span data-en="Next prayer — Asr">الصلاة القادمة — العصر</span>
-          <b data-en="3:47 PM">03:47 م</b>
-          <div class="prayer-mini">
-            <span data-en="Dhuhr 12:15">الظهر 12:15</span><span data-en="Maghrib 6:52">المغرب 06:52</span><span data-en="Isha 8:20">العشاء 08:20</span>
-          </div>
+          <span id="prayerNextLabel" data-en="Next prayer">الصلاة القادمة</span>
+          <b id="prayerNextTime">--:--</b>
+          <div class="prayer-mini" id="prayerMiniList"></div>
         </div>
       </div>
 
       <div class="section-title" style="margin-top:6px"><h2 data-en="Nearest mosques">أقرب المساجد</h2></div>
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Al-Fath Mosque">مسجد الفتح</h4><span data-en="Open for all prayers">يفتح لجميع الصلوات</span></div>
-        <div class="list-meta"><b data-en="310m">310م</b><small data-en="4 min walk">سيرًا 4 د</small></div>
-      </div>
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Airport prayer room">مصلى المطار</h4><span data-en="3rd floor — Gate 12">الطابق الثالث — بوابة 12</span></div>
-        <div class="list-meta"><b data-en="1.1km">1.1كم</b><small data-en="12 min walk">سيرًا 12 د</small></div>
+      <div id="mosqueResultsList">
+        <div class="booking-state"><i data-lucide="map-pin" width="24" height="24"></i><span data-en="Type your city above to find real nearby mosques and prayer times">اكتب مدينتك فوق عشان نلقى مساجد حقيقية قريبة منك وأوقات الصلاة</span></div>
       </div>
 
-      <div class="section-title"><h2 data-en="Halal markets &amp; groceries">سوبر ماركت وأسواق حلال</h2></div>
-      <div class="list-item">
-        <div class="list-icon coral"><i data-lucide="shopping-basket" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Halal Market Express</h4><span data-en="Certified halal meat &amp; goods">لحوم وذبائح حلال موثقة</span></div>
-        <div class="list-meta"><b>4.6★</b><small data-en="500m">500م</small></div>
+      <div class="section-title"><h2 data-en="Other places of worship">أماكن عبادة أخرى</h2></div>
+      <div id="worshipResultsList">
+        <div class="booking-state"><i data-lucide="church" width="22" height="22"></i><span data-en="Will appear once you search a city">رح تظهر بعد ما تكتب مدينة</span></div>
       </div>
 
-      <div class="section-title"><h2 data-en="Other places of worship">أماكن العبادة الأخرى</h2></div>
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="church" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="St. Joseph's Cathedral">كاتدرائية القديس يوسف</h4><span data-en="Mass times: 9 AM, 6 PM">مواعيد القداس: 9ص، 6م</span></div>
-        <div class="list-meta"><b data-en="900m">900م</b><small data-en="10 min walk">سيرًا 10 د</small></div>
-      </div>
+      <p class="country-info-note" data-en="Prayer times: Aladhan API (Muslim World League method) · Places: OpenStreetMap — verify locally, coverage varies by city." style="margin-top:14px;">أوقات الصلاة: Aladhan API (طريقة رابطة العالم الإسلامي) · الأماكن: OpenStreetMap — تأكد محليًا، التغطية بتختلف حسب المدينة.</p>
     </div>
   </div>
 
@@ -1413,43 +1359,14 @@
         <div class="top-actions">
           <button class="lang-btn" type="button" onclick="toggleLang()"><i data-lucide="globe" width="14" height="14"></i><span class="lang-btn-label">EN</span></button>
           <div class="icon-btn theme-toggle-btn" onclick="toggleTheme()"><i data-lucide="moon" width="17" height="17"></i></div>
-          <div class="icon-btn" onclick="showToast(currentLang==='ar' ? 'كل عناصر رحلتك محفوظة للاستخدام بدون إنترنت' : 'Everything in your trip is saved for offline use', 'check-circle-2')"><i data-lucide="download-cloud" width="17" height="17"></i></div>
         </div>
       </div>
       <p style="position:relative;z-index:2;color:var(--seafoam);font-size:11.5px;margin-top:10px;">
-        <i data-lucide="wifi-off" width="12" height="12" style="vertical-align:-2px"></i>
-        <span data-en="Available offline — maps saved">متاحة بدون إنترنت — خرائط محفوظة</span>
+        <i data-lucide="info" width="12" height="12" style="vertical-align:-2px"></i>
+        <span data-en="Saved for this session only — there's no account storage yet">محفوظة لهالجلسة بس — لسا ما فيه تخزين دائم بحساب</span>
       </p>
     </div>
-    <div class="content" style="margin-top:-18px">
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="landmark" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Al-Fath Mosque">مسجد الفتح</h4><span data-en="Saved for offline use">محفوظ للاستخدام دون إنترنت</span></div>
-        <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
-      </div>
-      <div class="list-item">
-        <div class="list-icon coral"><i data-lucide="utensils-crossed" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Al Sham Restaurant">مطعم الشام</h4><span data-en="Saved for offline use">محفوظ للاستخدام دون إنترنت</span></div>
-        <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
-      </div>
-      <div class="list-item">
-        <div class="list-icon"><i data-lucide="ship" width="19" height="19"></i></div>
-        <div class="list-text"><h4>Polar Latitude</h4><span data-en="Antarctica tour — Jan 12">جولة أنتاركتيكا — 12 يناير</span></div>
-        <div class="list-meta"><i data-lucide="check-circle-2" width="17" height="17" style="color:var(--turquoise)"></i></div>
-      </div>
-
-      <div class="divider-label" data-en="Community chat">مجتمع الدردشة</div>
-      <div class="list-item chat-room-trigger" data-room="argentina">
-        <div class="list-icon"><i data-lucide="message-circle" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Argentina Room 🇦🇷">غرفة الأرجنتين 🇦🇷</h4><span data-en="214 travelers active now">214 مسافر نشط الآن</span></div>
-        <div class="list-meta"><b>12</b><small data-en="new messages">رسالة جديدة</small></div>
-      </div>
-      <div class="list-item chat-room-trigger" data-room="istanbul">
-        <div class="list-icon coral"><i data-lucide="message-circle" width="19" height="19"></i></div>
-        <div class="list-text"><h4 data-en="Turkey Room 🇹🇷">غرفة تركيا 🇹🇷</h4><span data-en="356 travelers active now">356 مسافر نشط الآن</span></div>
-        <div class="list-meta"><b>3</b><small data-en="new messages">رسالة جديدة</small></div>
-      </div>
-    </div>
+    <div class="content" style="margin-top:-18px" id="tripListContent"></div>
   </div>
 
   <!-- ================= CHAT ROOM ================= -->
@@ -1532,7 +1449,7 @@
 
       <div class="poi-sheet-note">
         <i data-lucide="info" width="15" height="15"></i>
-        <span data-en="This is an example listing for demo purposes — it isn't linked to real photos yet.">هاد مكان توضيحي (Demo) لعرض آلية الفلترة — مش مربوط بصور حقيقية بعد.</span>
+        <span data-en="Real place data from OpenStreetMap · community-maintained, so details or photos may be missing or outdated.">بيانات مكان حقيقية من OpenStreetMap · قاعدة بيانات مجتمعية، فممكن تكون بعض التفاصيل أو الصور ناقصة أو قديمة.</span>
       </div>
 
       <button class="cta-btn" id="poiSheetHotelCta" style="display:none;" onclick="closePoiSheet(); goToScreen('screen-booking');">
@@ -1870,26 +1787,16 @@
   document.querySelectorAll('.map-pin.poi-pin').forEach(bindPoiPin);
 
   // ---------- Smart Search: scope, category filters, budget, results ----------
-  const SEARCH_POIS = [
-    {id:'r1', cat:'restaurant', name:'مطعم الشام', nameEn:'Al Sham Restaurant', desc:'حلال · مطبخ شامي', descEn:'Halal · Levantine cuisine', rating:4.7, dist:'320م', distEn:'320m', price:12, top:30, left:63},
-    {id:'r2', cat:'restaurant', name:'Le Bosphore', nameEn:'Le Bosphore', desc:'حلال · مأكولات بحرية', descEn:'Halal · Seafood', rating:4.5, dist:'600م', distEn:'600m', price:28, top:78, left:70},
-    {id:'r3', cat:'restaurant', name:'Anatolia Grill', nameEn:'Anatolia Grill', desc:'حلال · شواء', descEn:'Halal · Grill', rating:4.4, dist:'850م', distEn:'850m', price:9, top:88, left:40},
-    {id:'h1', cat:'hotel', name:'فندق لو ماريه', nameEn:'Le Marais Hotel', desc:'4 نجوم · قريب من المترو', descEn:'4-star · Near metro', rating:4.6, dist:'450م', distEn:'450m', price:140, top:45, left:15, unit:'night'},
-    {id:'h2', cat:'hotel', name:'Hôtel de Ville Suites', nameEn:'Hôtel de Ville Suites', desc:'بوتيك · إفطار مجاني', descEn:'Boutique · Free breakfast', rating:4.3, dist:'900م', distEn:'900m', price:95, top:12, left:52, unit:'night'},
-    {id:'s1', cat:'supermarket', name:'سوبرماركت حلال إكسبريس', nameEn:'Halal Market Express', desc:'لحوم وذبائح موثقة', descEn:'Certified halal meat & goods', rating:4.6, dist:'500م', distEn:'500m', price:18, top:58, left:85},
-    {id:'s2', cat:'supermarket', name:'Monoprix Champs', nameEn:'Monoprix Champs', desc:'سوبرماركت عام', descEn:'General supermarket', rating:4.1, dist:'700م', distEn:'700m', price:22, top:6, left:32},
-    {id:'c1', cat:'clothing', name:'غاليري لافاييت', nameEn:'Galeries Lafayette', desc:'أزياء وماركات عالمية', descEn:'Fashion & global brands', rating:4.5, dist:'1.1كم', distEn:'1.1km', price:65, top:22, left:78},
-    {id:'c2', cat:'clothing', name:'Zara Champs-Élysées', nameEn:'Zara Champs-Élysées', desc:'أزياء عصرية', descEn:'Contemporary fashion', rating:4.2, dist:'400م', distEn:'400m', price:24, top:90, left:60},
-    {id:'g1', cat:'gifts', name:'متجر هدايا باريس', nameEn:'Paris Gift Boutique', desc:'تذكارات وهدايا مميزة', descEn:'Souvenirs & keepsakes', rating:4.4, dist:'350م', distEn:'350m', price:15, top:10, left:10},
-    {id:'g2', cat:'gifts', name:'La Parfumerie', nameEn:'La Parfumerie', desc:'عطور وهدايا فاخرة', descEn:'Perfume & luxury gifts', rating:4.6, dist:'620م', distEn:'620m', price:38, top:68, left:10}
-  ];
-
+  // Real places search — no invented data. Categories map to OpenStreetMap
+  // tags; results come live from Nominatim (geocoding) + Overpass (POI
+  // query), both free and keyless. OSM has no price/rating fields, so we
+  // only show what's genuinely there: name, address, and real distance.
   const SEARCH_CATEGORY_META = {
-    restaurant:{icon:'utensils-crossed', pinColor:'coral'},
-    hotel:{icon:'bed-double', pinColor:'ocean'},
-    supermarket:{icon:'shopping-basket', pinColor:'gold'},
-    clothing:{icon:'shirt', pinColor:'gold'},
-    gifts:{icon:'gift', pinColor:'gold'}
+    restaurant:{icon:'utensils-crossed', pinColor:'coral', osm:'node["amenity"="restaurant"]'},
+    hotel:{icon:'bed-double', pinColor:'ocean', osm:'node["tourism"="hotel"]'},
+    supermarket:{icon:'shopping-basket', pinColor:'gold', osm:'node["shop"="supermarket"]'},
+    clothing:{icon:'shirt', pinColor:'gold', osm:'node["shop"="clothes"]'},
+    gifts:{icon:'gift', pinColor:'gold', osm:'node["shop"="gift"]'}
   };
 
   const SEARCH_SCOPE_PLACEHOLDERS = {
@@ -1927,102 +1834,143 @@
     });
   });
 
-  const searchBudgetSlider = document.getElementById('searchBudgetSlider');
-  if(searchBudgetSlider){
-    searchBudgetSlider.addEventListener('input', ()=>{
-      document.getElementById('searchBudgetValue').textContent = '$' + searchBudgetSlider.value;
-      renderSearchResults();
-    });
+  let lastSearchResults = [];
+  let searchRequestId = 0;
+  let searchDebounceTimer = null;
+
+  async function geocodeQuery(query){
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=' + encodeURIComponent(query));
+    if(!res.ok) throw new Error('geocode failed');
+    const data = await res.json();
+    if(!data.length) return null;
+    return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
+  }
+
+  async function overpassSearch(lat, lon, categories){
+    const radius = 1800;
+    const clauses = categories.map(cat => SEARCH_CATEGORY_META[cat].osm + '(around:' + radius + ',' + lat + ',' + lon + ');').join('');
+    const query = '[out:json][timeout:20];(' + clauses + ');out body 40;';
+    const res = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:'data=' + encodeURIComponent(query)});
+    if(!res.ok) throw new Error('overpass failed');
+    const data = await res.json();
+    return data.elements || [];
+  }
+
+  function categoryForElement(el){
+    const tags = el.tags || {};
+    if(tags.amenity === 'restaurant') return 'restaurant';
+    if(tags.tourism === 'hotel') return 'hotel';
+    if(tags.shop === 'supermarket') return 'supermarket';
+    if(tags.shop === 'clothes') return 'clothing';
+    if(tags.shop === 'gift') return 'gifts';
+    return null;
+  }
+
+  function formatDistKm(km){
+    if(km == null) return '';
+    return km < 1 ? (Math.round(km*1000) + (currentLang === 'ar' ? 'م' : 'm')) : (km.toFixed(1) + (currentLang === 'ar' ? 'كم' : 'km'));
+  }
+
+  async function runLiveSearch(){
+    const activeCats = Array.from(document.querySelectorAll('.filter-chip[data-cat].active')).map(c=>c.dataset.cat);
+    const query = (document.getElementById('searchInput').value || '').trim();
+    const listEl = document.getElementById('searchResultsList');
+    const titleEl = document.getElementById('searchResultsTitle');
+
+    if(!query || query.length < 3){
+      setLocalizedText(titleEl, 'اكتب مكان للبحث', 'Type a place to search');
+      listEl.innerHTML = '<div class="booking-state"><i data-lucide="map-pin" width="24" height="24"></i><span>' +
+        (currentLang === 'ar' ? 'اكتب اسم مكان (3 أحرف عالأقل) عشان نبحث عن أماكن حقيقية قريبة منه' : 'Type a place name (3+ characters) to search real nearby places') +
+        '</span></div>';
+      return;
+    }
+    if(!activeCats.length){
+      listEl.innerHTML = '<div class="booking-state"><i data-lucide="filter-x" width="24" height="24"></i><span>' +
+        (currentLang === 'ar' ? 'فعّل فئة وحدة عالأقل من الفلاتر فوق' : 'Turn on at least one category filter above') +
+        '</span></div>';
+      return;
+    }
+
+    const myId = ++searchRequestId;
+    listEl.innerHTML = '<div class="booking-state"><i data-lucide="loader-circle" width="22" height="22"></i><span>' +
+      (currentLang === 'ar' ? 'عم نبحث عن أماكن حقيقية…' : 'Searching real places…') + '</span></div>';
+    lucide.createIcons();
+
+    try{
+      const place = await geocodeQuery(query);
+      if(myId !== searchRequestId) return;
+      if(!place){
+        listEl.innerHTML = '<div class="booking-state"><i data-lucide="search-x" width="24" height="24"></i><span>' +
+          (currentLang === 'ar' ? 'ما لقينا هالمكان — جرّب اسم أدق' : "Couldn't find that place — try a more specific name") + '</span></div>';
+        return;
+      }
+      const elements = await overpassSearch(place.lat, place.lon, activeCats);
+      if(myId !== searchRequestId) return;
+
+      const results = elements
+        .filter(el => el.tags && el.tags.name)
+        .map(el=>{
+          const cat = categoryForElement(el);
+          if(!cat) return null;
+          const elLat = el.lat || (el.center && el.center.lat);
+          const elLon = el.lon || (el.center && el.center.lon);
+          const distKm = (elLat && elLon) ? haversineKm(place.lat, place.lon, elLat, elLon) : null;
+          const addr = [el.tags['addr:street'], el.tags['addr:housenumber']].filter(Boolean).join(' ');
+          return {id: 'osm' + el.id, cat, name: el.tags.name, addr, distKm};
+        })
+        .filter(Boolean)
+        .sort((a,b)=> (a.distKm==null?99:a.distKm) - (b.distKm==null?99:b.distKm))
+        .slice(0, 30);
+
+      lastSearchResults = results;
+
+      setLocalizedText(titleEl,
+        results.length + ' ' + (results.length === 1 ? 'نتيجة حقيقية' : 'نتائج حقيقية'),
+        results.length + ' real ' + (results.length === 1 ? 'result' : 'results')
+      );
+
+      if(!results.length){
+        listEl.innerHTML = '<div class="booking-state"><i data-lucide="search-x" width="24" height="24"></i><span>' +
+          (currentLang === 'ar' ? 'ما لقينا أماكن مطابقة بمحيط قريب من هالموقع' : 'No matching places found near that location') + '</span></div>';
+        return;
+      }
+
+      listEl.innerHTML = results.map(poi=>{
+        const meta = SEARCH_CATEGORY_META[poi.cat];
+        const listClass = meta.pinColor === 'ocean' ? '' : meta.pinColor;
+        return '<div class="list-item" onclick="openPoiSheet(\'' + poi.id + '\')">' +
+          '<div class="list-icon ' + listClass + '"><i data-lucide="' + meta.icon + '" width="19" height="19"></i></div>' +
+          '<div class="list-text"><h4>' + poi.name + '</h4><span>' + (poi.addr || (currentLang === 'ar' ? 'عنوان غير مسجّل' : 'No address on record')) + '</span></div>' +
+          '<div class="list-meta"><small>' + formatDistKm(poi.distKm) + '</small></div>' +
+        '</div>';
+      }).join('');
+      lucide.createIcons();
+    }catch(err){
+      if(myId !== searchRequestId) return;
+      listEl.innerHTML = '<div class="booking-state"><i data-lucide="wifi-off" width="24" height="24"></i><span>' +
+        (currentLang === 'ar' ? 'تعذّر الاتصال بمصدر البيانات، جرّب كمان شوي' : 'Could not reach the data source — try again shortly') + '</span></div>';
+    }
   }
 
   function renderSearchResults(){
-    const activeCats = Array.from(document.querySelectorAll('.filter-chip[data-cat].active')).map(c=>c.dataset.cat);
-    const maxBudget = Number(document.getElementById('searchBudgetSlider').value);
-    const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-
-    const filtered = SEARCH_POIS.filter(poi=>{
-      if(!activeCats.includes(poi.cat)) return false;
-      if(poi.price > maxBudget) return false;
-      if(query){
-        const hay = (poi.name + ' ' + poi.nameEn + ' ' + poi.desc + ' ' + poi.descEn).toLowerCase();
-        if(!hay.includes(query)) return false;
-      }
-      return true;
-    });
-
-    const listEl = document.getElementById('searchResultsList');
-    if(!filtered.length){
-      listEl.innerHTML = '<div class="booking-state"><i data-lucide="search-x" width="24" height="24"></i><span>' +
-        (currentLang === 'ar' ? 'ما لقينا نتائج مطابقة، جرّب توسيع الميزانية أو الفلاتر' : 'No matching results — try widening your budget or filters') +
-        '</span></div>';
-    } else {
-      listEl.innerHTML = filtered.map(poi=>{
-        const meta = SEARCH_CATEGORY_META[poi.cat];
-        const listClass = meta.pinColor === 'ocean' ? '' : meta.pinColor;
-        const unitAr = poi.unit === 'night' ? '/ليلة' : '';
-        const unitEn = poi.unit === 'night' ? '/night' : '';
-        return '<div class="list-item" onclick="openPoiSheet(\'' + poi.id + '\')">' +
-          '<div class="list-icon ' + listClass + '"><i data-lucide="' + meta.icon + '" width="19" height="19"></i></div>' +
-          '<div class="list-text"><h4>' + (currentLang === 'ar' ? poi.name : poi.nameEn) + '</h4><span>' + (currentLang === 'ar' ? poi.desc : poi.descEn) + ' · ' + poi.rating + '★</span></div>' +
-          '<div class="list-meta"><b>$' + poi.price + (currentLang === 'ar' ? unitAr : unitEn) + '</b><small>' + (currentLang === 'ar' ? poi.dist : poi.distEn) + '</small></div>' +
-        '</div>';
-      }).join('');
-    }
-
-    const canvas = document.getElementById('searchMapCanvas');
-    const tooltip = canvas.querySelector('.map-tooltip');
-    canvas.querySelectorAll('.map-pin.poi-pin[data-poi]').forEach(p=>p.remove());
-    filtered.forEach(poi=>{
-      const meta = SEARCH_CATEGORY_META[poi.cat];
-      const pin = document.createElement('div');
-      pin.className = 'map-pin poi-pin ' + meta.pinColor;
-      pin.dataset.poi = poi.id;
-      pin.dataset.name = poi.name;
-      pin.dataset.nameEn = poi.nameEn;
-      pin.dataset.dist = poi.dist;
-      pin.dataset.distEn = poi.distEn;
-      pin.style.top = poi.top + '%';
-      pin.style.left = poi.left + '%';
-      pin.innerHTML = '<i data-lucide="' + meta.icon + '" width="13" height="13"></i>';
-      canvas.insertBefore(pin, tooltip);
-      bindPoiPin(pin);
-    });
-
-    setLocalizedText(document.getElementById('searchResultsTitle'),
-      filtered.length + ' ' + (filtered.length === 1 ? 'نتيجة مطابقة' : 'نتائج مطابقة'),
-      filtered.length + ' matching ' + (filtered.length === 1 ? 'result' : 'results')
-    );
-
-    const estEl = document.getElementById('searchBudgetEstimate');
-    if(filtered.length){
-      const prices = filtered.map(p=>p.price);
-      setLocalizedText(estEl,
-        'الميزانية المقدّرة: $' + Math.min(...prices) + ' – $' + Math.max(...prices),
-        'Est. budget: $' + Math.min(...prices) + ' – $' + Math.max(...prices)
-      );
-    } else {
-      setLocalizedText(estEl, '', '');
-    }
-
-    lucide.createIcons();
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(runLiveSearch, 700);
   }
   window.renderSearchResults = renderSearchResults;
 
   function openPoiSheet(id){
-    const poi = SEARCH_POIS.find(p=>p.id===id);
+    const poi = lastSearchResults.find(p=>p.id === id);
     if(!poi) return;
     const meta = SEARCH_CATEGORY_META[poi.cat];
     const colorMap = {coral:'var(--coral)', ocean:'var(--ocean)', gold:'var(--turquoise)'};
     document.getElementById('poiSheetHero').style.background =
       'linear-gradient(135deg,' + colorMap[meta.pinColor] + ',var(--deep-navy))';
     document.getElementById('poiSheetIcon').setAttribute('data-lucide', meta.icon);
-    document.getElementById('poiSheetName').textContent = currentLang === 'ar' ? poi.name : poi.nameEn;
-    document.getElementById('poiSheetDesc').textContent = currentLang === 'ar' ? poi.desc : poi.descEn;
-    const unitAr = poi.unit === 'night' ? '/ليلة' : '';
-    const unitEn = poi.unit === 'night' ? '/night' : '';
-    document.getElementById('poiSheetPrice').textContent = '$' + poi.price + (currentLang === 'ar' ? unitAr : unitEn);
-    document.getElementById('poiSheetRating').textContent = poi.rating + '★';
-    document.getElementById('poiSheetDist').textContent = currentLang === 'ar' ? poi.dist : poi.distEn;
+    document.getElementById('poiSheetName').textContent = poi.name;
+    document.getElementById('poiSheetDesc').textContent = poi.addr || (currentLang === 'ar' ? 'عنوان غير مسجّل' : 'No address on record');
+    document.getElementById('poiSheetPrice').textContent = currentLang === 'ar' ? 'غير متاح' : 'N/A';
+    document.getElementById('poiSheetRating').textContent = currentLang === 'ar' ? 'غير متاح' : 'N/A';
+    document.getElementById('poiSheetDist').textContent = formatDistKm(poi.distKm) || '—';
     document.getElementById('poiSheetHotelCta').style.display = poi.cat === 'hotel' ? 'flex' : 'none';
     document.getElementById('poiSheetBackdrop').classList.add('show');
     lucide.createIcons();
@@ -2037,55 +1985,221 @@
   function resetSearchFilters(){
     document.getElementById('searchInput').value = '';
     document.querySelectorAll('.filter-chip[data-cat]').forEach(c=>c.classList.add('active'));
-    const slider = document.getElementById('searchBudgetSlider');
-    slider.value = slider.max;
-    document.getElementById('searchBudgetValue').textContent = '$' + slider.max;
     setSearchScope('region');
     renderSearchResults();
   }
   window.resetSearchFilters = resetSearchFilters;
 
+  // ---------- Sacred Sites: real prayer times (Aladhan) + real places (OSM) ----------
+  let muslimCornerRequestId = 0;
+  let muslimCornerDebounce = null;
+
+  const PRAYER_NAMES = {
+    Fajr:{ar:'الفجر', en:'Fajr'}, Dhuhr:{ar:'الظهر', en:'Dhuhr'}, Asr:{ar:'العصر', en:'Asr'},
+    Maghrib:{ar:'المغرب', en:'Maghrib'}, Isha:{ar:'العشاء', en:'Isha'}
+  };
+
+  function parseHHMM(t){
+    // Aladhan times look like "14:32" (sometimes "14:32 (TZ)") — take the HH:MM part.
+    const clean = t.split(' ')[0];
+    const [h,m] = clean.split(':').map(Number);
+    return h*60+m;
+  }
+  function formatMinutesAsClock(mins){
+    let h = Math.floor(mins/60) % 24;
+    const m = mins % 60;
+    const ampm = h >= 12 ? (currentLang === 'ar' ? 'م' : 'PM') : (currentLang === 'ar' ? 'ص' : 'AM');
+    let h12 = h % 12; if(h12 === 0) h12 = 12;
+    return h12 + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
+
+  async function fetchPrayerTimes(lat, lon){
+    const today = new Date();
+    const dateStr = String(today.getDate()).padStart(2,'0') + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + today.getFullYear();
+    const res = await fetch('https://api.aladhan.com/v1/timings/' + dateStr + '?latitude=' + lat + '&longitude=' + lon + '&method=3');
+    if(!res.ok) throw new Error('prayer times failed');
+    const data = await res.json();
+    return data.data.timings;
+  }
+
+  function renderPrayerStrip(timings){
+    const strip = document.getElementById('prayerStrip');
+    const order = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+    const nowMin = new Date().getHours()*60 + new Date().getMinutes();
+    let next = null;
+    for(const name of order){
+      if(!timings[name]) continue;
+      if(parseHHMM(timings[name]) >= nowMin){ next = name; break; }
+    }
+    if(!next) next = order[0]; // after Isha, next is tomorrow's Fajr
+
+    const nextLabel = document.getElementById('prayerNextLabel');
+    setLocalizedText(nextLabel,
+      'الصلاة القادمة — ' + PRAYER_NAMES[next].ar,
+      'Next prayer — ' + PRAYER_NAMES[next].en
+    );
+    document.getElementById('prayerNextTime').textContent = formatMinutesAsClock(parseHHMM(timings[next]));
+
+    const mini = document.getElementById('prayerMiniList');
+    mini.innerHTML = order.filter(n=>n!==next).map(n=>
+      '<span>' + (currentLang === 'ar' ? PRAYER_NAMES[n].ar : PRAYER_NAMES[n].en) + ' ' + formatMinutesAsClock(parseHHMM(timings[n])) + '</span>'
+    ).join('');
+    strip.style.display = 'flex';
+  }
+
+  async function overpassWorshipSearch(lat, lon){
+    const radius = 3000;
+    const query = '[out:json][timeout:20];(' +
+      'node["amenity"="place_of_worship"](around:' + radius + ',' + lat + ',' + lon + ');' +
+      ');out body 40;';
+    const res = await fetch('https://overpass-api.de/api/interpreter', {method:'POST', body:'data=' + encodeURIComponent(query)});
+    if(!res.ok) throw new Error('overpass failed');
+    const data = await res.json();
+    return data.elements || [];
+  }
+
+  function renderPlaceList(elId, items, emptyAr, emptyEn){
+    const el = document.getElementById(elId);
+    if(!items.length){
+      el.innerHTML = '<div class="booking-state"><i data-lucide="search-x" width="22" height="22"></i><span>' +
+        (currentLang === 'ar' ? emptyAr : emptyEn) + '</span></div>';
+      return;
+    }
+    el.innerHTML = items.map(p=>{
+      const icon = p.religion === 'muslim' ? 'moon-star' : 'church';
+      return '<div class="list-item" style="cursor:default;">' +
+        '<div class="list-icon"><i data-lucide="' + icon + '" width="19" height="19"></i></div>' +
+        '<div class="list-text"><h4>' + p.name + '</h4><span>' + (p.addr || (currentLang === 'ar' ? 'عنوان غير مسجّل' : 'No address on record')) + '</span></div>' +
+        '<div class="list-meta"><small>' + formatDistKm(p.distKm) + '</small></div>' +
+      '</div>';
+    }).join('');
+    lucide.createIcons();
+  }
+
+  function renderMuslimCorner(){
+    clearTimeout(muslimCornerDebounce);
+    muslimCornerDebounce = setTimeout(runMuslimCornerSearch, 700);
+  }
+  window.renderMuslimCorner = renderMuslimCorner;
+
+  async function runMuslimCornerSearch(){
+    const query = (document.getElementById('muslimLocationInput').value || '').trim();
+    if(query.length < 3){
+      document.getElementById('prayerStrip').style.display = 'none';
+      renderPlaceList('mosqueResultsList', [], 'اكتب مدينتك فوق عشان نلقى مساجد حقيقية قريبة منك وأوقات الصلاة', 'Type your city above to find real nearby mosques and prayer times');
+      renderPlaceList('worshipResultsList', [], 'رح تظهر بعد ما تكتب مدينة', 'Will appear once you search a city');
+      return;
+    }
+
+    const myId = ++muslimCornerRequestId;
+    renderPlaceList('mosqueResultsList', [], 'عم نبحث…', 'Searching…');
+
+    try{
+      const place = await geocodeQuery(query);
+      if(myId !== muslimCornerRequestId) return;
+      if(!place){
+        renderPlaceList('mosqueResultsList', [], 'ما لقينا هالمكان — جرّب اسم أدق', "Couldn't find that place — try a more specific name");
+        document.getElementById('prayerStrip').style.display = 'none';
+        return;
+      }
+
+      fetchPrayerTimes(place.lat, place.lon).then(t=>{ if(myId === muslimCornerRequestId) renderPrayerStrip(t); }).catch(()=>{});
+
+      const elements = await overpassWorshipSearch(place.lat, place.lon);
+      if(myId !== muslimCornerRequestId) return;
+
+      const places = elements
+        .filter(el => el.tags && el.tags.name)
+        .map(el=>{
+          const elLat = el.lat || (el.center && el.center.lat);
+          const elLon = el.lon || (el.center && el.center.lon);
+          const distKm = (elLat && elLon) ? haversineKm(place.lat, place.lon, elLat, elLon) : null;
+          const addr = [el.tags['addr:street'], el.tags['addr:housenumber']].filter(Boolean).join(' ');
+          return {name: el.tags.name, addr, distKm, religion: el.tags.religion || ''};
+        })
+        .sort((a,b)=> (a.distKm==null?99:a.distKm) - (b.distKm==null?99:b.distKm));
+
+      const mosques = places.filter(p=>p.religion === 'muslim').slice(0,15);
+      const others = places.filter(p=>p.religion !== 'muslim').slice(0,15);
+
+      renderPlaceList('mosqueResultsList', mosques, 'ما لقينا مساجد مسجّلة بمحيط قريب على OpenStreetMap', 'No mosques recorded nearby on OpenStreetMap');
+      renderPlaceList('worshipResultsList', others, 'ما لقينا أماكن عبادة تانية بمحيط قريب', 'No other places of worship found nearby');
+    }catch(err){
+      if(myId !== muslimCornerRequestId) return;
+      renderPlaceList('mosqueResultsList', [], 'تعذّر الاتصال بمصدر البيانات، جرّب كمان شوي', 'Could not reach the data source — try again shortly');
+      document.getElementById('prayerStrip').style.display = 'none';
+    }
+  }
+
   // ---------- Country info: geography + live time comparison ----------
   // capitalAr/En, continentAr/En, population/populationEn, languageAr/En,
   // currencyAr/En, area/areaEn, tz (IANA zone for the capital), temp (typical
   // average °C, illustrative — not live weather), icon (lucide weather glyph).
-  const COUNTRY_DETAILS = {
-    FR:{capitalAr:'باريس',capitalEn:'Paris',continentAr:'أوروبا',continentEn:'Europe',population:'68 مليون',populationEn:'68M',languageAr:'الفرنسية',languageEn:'French',currencyAr:'يورو (EUR)',currencyEn:'Euro (EUR)',area:'551,695 كم²',areaEn:'551,695 km²',tz:'Europe/Paris',temp:16,icon:'cloud-sun'},
-    AE:{capitalAr:'أبوظبي',capitalEn:'Abu Dhabi',continentAr:'آسيا',continentEn:'Asia',population:'10 ملايين',populationEn:'10M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'درهم إماراتي (AED)',currencyEn:'UAE Dirham (AED)',area:'83,600 كم²',areaEn:'83,600 km²',tz:'Asia/Dubai',temp:34,icon:'sun'},
-    SA:{capitalAr:'الرياض',capitalEn:'Riyadh',continentAr:'آسيا',continentEn:'Asia',population:'36 مليون',populationEn:'36M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'ريال سعودي (SAR)',currencyEn:'Saudi Riyal (SAR)',area:'2,150,000 كم²',areaEn:'2,150,000 km²',tz:'Asia/Riyadh',temp:38,icon:'sun'},
-    QA:{capitalAr:'الدوحة',capitalEn:'Doha',continentAr:'آسيا',continentEn:'Asia',population:'2.7 مليون',populationEn:'2.7M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'ريال قطري (QAR)',currencyEn:'Qatari Riyal (QAR)',area:'11,586 كم²',areaEn:'11,586 km²',tz:'Asia/Qatar',temp:36,icon:'sun'},
-    KW:{capitalAr:'مدينة الكويت',capitalEn:'Kuwait City',continentAr:'آسيا',continentEn:'Asia',population:'4.3 مليون',populationEn:'4.3M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'دينار كويتي (KWD)',currencyEn:'Kuwaiti Dinar (KWD)',area:'17,818 كم²',areaEn:'17,818 km²',tz:'Asia/Kuwait',temp:37,icon:'sun'},
-    BH:{capitalAr:'المنامة',capitalEn:'Manama',continentAr:'آسيا',continentEn:'Asia',population:'1.5 مليون',populationEn:'1.5M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'دينار بحريني (BHD)',currencyEn:'Bahraini Dinar (BHD)',area:'786 كم²',areaEn:'786 km²',tz:'Asia/Bahrain',temp:35,icon:'sun'},
-    OM:{capitalAr:'مسقط',capitalEn:'Muscat',continentAr:'آسيا',continentEn:'Asia',population:'4.6 مليون',populationEn:'4.6M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'ريال عماني (OMR)',currencyEn:'Omani Rial (OMR)',area:'309,500 كم²',areaEn:'309,500 km²',tz:'Asia/Muscat',temp:33,icon:'sun'},
-    EG:{capitalAr:'القاهرة',capitalEn:'Cairo',continentAr:'أفريقيا',continentEn:'Africa',population:'106 مليون',populationEn:'106M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'جنيه مصري (EGP)',currencyEn:'Egyptian Pound (EGP)',area:'1,010,000 كم²',areaEn:'1,010,000 km²',tz:'Africa/Cairo',temp:28,icon:'sun'},
-    JO:{capitalAr:'عمّان',capitalEn:'Amman',continentAr:'آسيا',continentEn:'Asia',population:'11 مليون',populationEn:'11M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'دينار أردني (JOD)',currencyEn:'Jordanian Dinar (JOD)',area:'89,342 كم²',areaEn:'89,342 km²',tz:'Asia/Amman',temp:25,icon:'sun'},
-    LB:{capitalAr:'بيروت',capitalEn:'Beirut',continentAr:'آسيا',continentEn:'Asia',population:'5.5 مليون',populationEn:'5.5M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'ليرة لبنانية (LBP)',currencyEn:'Lebanese Pound (LBP)',area:'10,452 كم²',areaEn:'10,452 km²',tz:'Asia/Beirut',temp:24,icon:'sun'},
-    MA:{capitalAr:'الرباط',capitalEn:'Rabat',continentAr:'أفريقيا',continentEn:'Africa',population:'37 مليون',populationEn:'37M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'درهم مغربي (MAD)',currencyEn:'Moroccan Dirham (MAD)',area:'446,550 كم²',areaEn:'446,550 km²',tz:'Africa/Casablanca',temp:22,icon:'cloud-sun'},
-    TN:{capitalAr:'تونس',capitalEn:'Tunis',continentAr:'أفريقيا',continentEn:'Africa',population:'12 مليون',populationEn:'12M',languageAr:'العربية',languageEn:'Arabic',currencyAr:'دينار تونسي (TND)',currencyEn:'Tunisian Dinar (TND)',area:'163,610 كم²',areaEn:'163,610 km²',tz:'Africa/Tunis',temp:23,icon:'sun'},
-    TR:{capitalAr:'أنقرة',capitalEn:'Ankara',continentAr:'آسيا',continentEn:'Asia',population:'85 مليون',populationEn:'85M',languageAr:'التركية',languageEn:'Turkish',currencyAr:'ليرة تركية (TRY)',currencyEn:'Turkish Lira (TRY)',area:'783,562 كم²',areaEn:'783,562 km²',tz:'Europe/Istanbul',temp:20,icon:'cloud-sun'},
-    GB:{capitalAr:'لندن',capitalEn:'London',continentAr:'أوروبا',continentEn:'Europe',population:'68 مليون',populationEn:'68M',languageAr:'الإنجليزية',languageEn:'English',currencyAr:'جنيه إسترليني (GBP)',currencyEn:'Pound Sterling (GBP)',area:'243,610 كم²',areaEn:'243,610 km²',tz:'Europe/London',temp:14,icon:'cloud'},
-    DE:{capitalAr:'برلين',capitalEn:'Berlin',continentAr:'أوروبا',continentEn:'Europe',population:'84 مليون',populationEn:'84M',languageAr:'الألمانية',languageEn:'German',currencyAr:'يورو (EUR)',currencyEn:'Euro (EUR)',area:'357,592 كم²',areaEn:'357,592 km²',tz:'Europe/Berlin',temp:14,icon:'cloud'},
-    IT:{capitalAr:'روما',capitalEn:'Rome',continentAr:'أوروبا',continentEn:'Europe',population:'59 مليون',populationEn:'59M',languageAr:'الإيطالية',languageEn:'Italian',currencyAr:'يورو (EUR)',currencyEn:'Euro (EUR)',area:'301,340 كم²',areaEn:'301,340 km²',tz:'Europe/Rome',temp:18,icon:'sun'},
-    ES:{capitalAr:'مدريد',capitalEn:'Madrid',continentAr:'أوروبا',continentEn:'Europe',population:'48 مليون',populationEn:'48M',languageAr:'الإسبانية',languageEn:'Spanish',currencyAr:'يورو (EUR)',currencyEn:'Euro (EUR)',area:'505,990 كم²',areaEn:'505,990 km²',tz:'Europe/Madrid',temp:19,icon:'sun'},
-    NL:{capitalAr:'أمستردام',capitalEn:'Amsterdam',continentAr:'أوروبا',continentEn:'Europe',population:'18 مليون',populationEn:'18M',languageAr:'الهولندية',languageEn:'Dutch',currencyAr:'يورو (EUR)',currencyEn:'Euro (EUR)',area:'41,850 كم²',areaEn:'41,850 km²',tz:'Europe/Amsterdam',temp:13,icon:'cloud'},
-    CH:{capitalAr:'برن',capitalEn:'Bern',continentAr:'أوروبا',continentEn:'Europe',population:'8.8 مليون',populationEn:'8.8M',languageAr:'الألمانية/الفرنسية',languageEn:'German/French',currencyAr:'فرنك سويسري (CHF)',currencyEn:'Swiss Franc (CHF)',area:'41,285 كم²',areaEn:'41,285 km²',tz:'Europe/Zurich',temp:11,icon:'cloud'},
-    JP:{capitalAr:'طوكيو',capitalEn:'Tokyo',continentAr:'آسيا',continentEn:'Asia',population:'124 مليون',populationEn:'124M',languageAr:'اليابانية',languageEn:'Japanese',currencyAr:'ين ياباني (JPY)',currencyEn:'Japanese Yen (JPY)',area:'377,975 كم²',areaEn:'377,975 km²',tz:'Asia/Tokyo',temp:17,icon:'cloud-sun'},
-    CN:{capitalAr:'بكين',capitalEn:'Beijing',continentAr:'آسيا',continentEn:'Asia',population:'1.41 مليار',populationEn:'1.41B',languageAr:'الصينية',languageEn:'Mandarin Chinese',currencyAr:'يوان صيني (CNY)',currencyEn:'Chinese Yuan (CNY)',area:'9,596,960 كم²',areaEn:'9,596,960 km²',tz:'Asia/Shanghai',temp:15,icon:'cloud'},
-    KR:{capitalAr:'سيول',capitalEn:'Seoul',continentAr:'آسيا',continentEn:'Asia',population:'52 مليون',populationEn:'52M',languageAr:'الكورية',languageEn:'Korean',currencyAr:'وون كوري (KRW)',currencyEn:'South Korean Won (KRW)',area:'100,210 كم²',areaEn:'100,210 km²',tz:'Asia/Seoul',temp:13,icon:'cloud'},
-    IN:{capitalAr:'نيودلهي',capitalEn:'New Delhi',continentAr:'آسيا',continentEn:'Asia',population:'1.44 مليار',populationEn:'1.44B',languageAr:'الهندية/الإنجليزية',languageEn:'Hindi/English',currencyAr:'روبية هندية (INR)',currencyEn:'Indian Rupee (INR)',area:'3,287,263 كم²',areaEn:'3,287,263 km²',tz:'Asia/Kolkata',temp:28,icon:'sun'},
-    ID:{capitalAr:'جاكرتا',capitalEn:'Jakarta',continentAr:'آسيا',continentEn:'Asia',population:'280 مليون',populationEn:'280M',languageAr:'الإندونيسية',languageEn:'Indonesian',currencyAr:'روبية إندونيسية (IDR)',currencyEn:'Indonesian Rupiah (IDR)',area:'1,904,569 كم²',areaEn:'1,904,569 km²',tz:'Asia/Jakarta',temp:29,icon:'cloud-sun'},
-    MY:{capitalAr:'كوالالمبور',capitalEn:'Kuala Lumpur',continentAr:'آسيا',continentEn:'Asia',population:'34 مليون',populationEn:'34M',languageAr:'الملايو',languageEn:'Malay',currencyAr:'رينغيت ماليزي (MYR)',currencyEn:'Malaysian Ringgit (MYR)',area:'330,803 كم²',areaEn:'330,803 km²',tz:'Asia/Kuala_Lumpur',temp:29,icon:'cloud-rain'},
-    TH:{capitalAr:'بانكوك',capitalEn:'Bangkok',continentAr:'آسيا',continentEn:'Asia',population:'72 مليون',populationEn:'72M',languageAr:'التايلاندية',languageEn:'Thai',currencyAr:'بات تايلاندي (THB)',currencyEn:'Thai Baht (THB)',area:'513,120 كم²',areaEn:'513,120 km²',tz:'Asia/Bangkok',temp:30,icon:'sun'},
-    SG:{capitalAr:'سنغافورة',capitalEn:'Singapore',continentAr:'آسيا',continentEn:'Asia',population:'5.9 مليون',populationEn:'5.9M',languageAr:'الإنجليزية/الملايو/الماندرين',languageEn:'English/Malay/Mandarin',currencyAr:'دولار سنغافوري (SGD)',currencyEn:'Singapore Dollar (SGD)',area:'728 كم²',areaEn:'728 km²',tz:'Asia/Singapore',temp:28,icon:'cloud-sun'},
-    US:{capitalAr:'واشنطن العاصمة',capitalEn:'Washington, D.C.',continentAr:'أمريكا الشمالية',continentEn:'North America',population:'335 مليون',populationEn:'335M',languageAr:'الإنجليزية',languageEn:'English',currencyAr:'دولار أمريكي (USD)',currencyEn:'US Dollar (USD)',area:'9,833,517 كم²',areaEn:'9,833,517 km²',tz:'America/New_York',temp:16,icon:'cloud-sun'},
-    CA:{capitalAr:'أوتاوا',capitalEn:'Ottawa',continentAr:'أمريكا الشمالية',continentEn:'North America',population:'39 مليون',populationEn:'39M',languageAr:'الإنجليزية/الفرنسية',languageEn:'English/French',currencyAr:'دولار كندي (CAD)',currencyEn:'Canadian Dollar (CAD)',area:'9,984,670 كم²',areaEn:'9,984,670 km²',tz:'America/Toronto',temp:10,icon:'cloud'},
-    BR:{capitalAr:'برازيليا',capitalEn:'Brasília',continentAr:'أمريكا الجنوبية',continentEn:'South America',population:'217 مليون',populationEn:'217M',languageAr:'البرتغالية',languageEn:'Portuguese',currencyAr:'ريال برازيلي (BRL)',currencyEn:'Brazilian Real (BRL)',area:'8,515,767 كم²',areaEn:'8,515,767 km²',tz:'America/Sao_Paulo',temp:24,icon:'sun'},
-    MX:{capitalAr:'مكسيكو سيتي',capitalEn:'Mexico City',continentAr:'أمريكا الشمالية',continentEn:'North America',population:'128 مليون',populationEn:'128M',languageAr:'الإسبانية',languageEn:'Spanish',currencyAr:'بيزو مكسيكي (MXN)',currencyEn:'Mexican Peso (MXN)',area:'1,964,375 كم²',areaEn:'1,964,375 km²',tz:'America/Mexico_City',temp:20,icon:'sun'},
-    AR:{capitalAr:'بوينس آيرس',capitalEn:'Buenos Aires',continentAr:'أمريكا الجنوبية',continentEn:'South America',population:'46 مليون',populationEn:'46M',languageAr:'الإسبانية',languageEn:'Spanish',currencyAr:'بيزو أرجنتيني (ARS)',currencyEn:'Argentine Peso (ARS)',area:'2,780,400 كم²',areaEn:'2,780,400 km²',tz:'America/Argentina/Buenos_Aires',temp:18,icon:'cloud-sun'},
-    AU:{capitalAr:'كانبرا',capitalEn:'Canberra',continentAr:'أوقيانوسيا',continentEn:'Oceania',population:'26 مليون',populationEn:'26M',languageAr:'الإنجليزية',languageEn:'English',currencyAr:'دولار أسترالي (AUD)',currencyEn:'Australian Dollar (AUD)',area:'7,692,024 كم²',areaEn:'7,692,024 km²',tz:'Australia/Sydney',temp:22,icon:'sun'},
-    ZA:{capitalAr:'بريتوريا',capitalEn:'Pretoria',continentAr:'أفريقيا',continentEn:'Africa',population:'60 مليون',populationEn:'60M',languageAr:'الإنجليزية وأخرى',languageEn:'English & others',currencyAr:'راند جنوب أفريقي (ZAR)',currencyEn:'South African Rand (ZAR)',area:'1,221,037 كم²',areaEn:'1,221,037 km²',tz:'Africa/Johannesburg',temp:19,icon:'sun'},
-    RU:{capitalAr:'موسكو',capitalEn:'Moscow',continentAr:'أوروبا وآسيا',continentEn:'Europe & Asia',population:'144 مليون',populationEn:'144M',languageAr:'الروسية',languageEn:'Russian',currencyAr:'روبل روسي (RUB)',currencyEn:'Russian Ruble (RUB)',area:'17,098,242 كم²',areaEn:'17,098,242 km²',tz:'Europe/Moscow',temp:9,icon:'cloud'}
+  // Country facts now come live from the REST Countries API (free, no key) —
+  // works for every country, not just a curated list. Weather comes live
+  // from Open-Meteo (free, no key). Small dictionaries below are just
+  // translations of standard geography terms (continent/language names),
+  // not fabricated facts, and fall back to the API's English text when a
+  // term isn't in the dictionary.
+  const REGION_AR = {
+    Europe:'أوروبا', Asia:'آسيا', Africa:'أفريقيا', Americas:'الأمريكتان',
+    Oceania:'أوقيانوسيا', Antarctic:'القارة القطبية الجنوبية', Polar:'القطب'
   };
+  const CAPITAL_AR = {
+    FR:'باريس', AE:'أبوظبي', SA:'الرياض', QA:'الدوحة', KW:'مدينة الكويت', BH:'المنامة',
+    OM:'مسقط', EG:'القاهرة', JO:'عمّان', LB:'بيروت', MA:'الرباط', TN:'تونس', TR:'أنقرة',
+    GB:'لندن', DE:'برلين', IT:'روما', ES:'مدريد', NL:'أمستردام', CH:'برن', JP:'طوكيو',
+    CN:'بكين', KR:'سيول', IN:'نيودلهي', ID:'جاكرتا', MY:'كوالالمبور', TH:'بانكوك',
+    SG:'سنغافورة', US:'واشنطن العاصمة', CA:'أوتاوا', BR:'برازيليا', MX:'مكسيكو سيتي',
+    AR:'بوينس آيرس', AU:'كانبرا', ZA:'بريتوريا', RU:'موسكو', PS:'القدس', IQ:'بغداد',
+    SY:'دمشق', YE:'صنعاء', LY:'طرابلس', SD:'الخرطوم', DZ:'الجزائر'
+  };
+  const LANG_AR = {
+    English:'الإنجليزية', French:'الفرنسية', Arabic:'العربية', Spanish:'الإسبانية',
+    German:'الألمانية', Italian:'الإيطالية', Portuguese:'البرتغالية', Dutch:'الهولندية',
+    Turkish:'التركية', Japanese:'اليابانية', Korean:'الكورية', Mandarin:'الماندرين',
+    Chinese:'الصينية', Russian:'الروسية', Hindi:'الهندية', Indonesian:'الإندونيسية',
+    Malay:'الملايو', Thai:'التايلاندية', Vietnamese:'الفيتنامية', Swahili:'السواحيلية',
+    Persian:'الفارسية', Urdu:'الأردية', Bengali:'البنغالية', Greek:'اليونانية',
+    Polish:'البولندية', Swedish:'السويدية', Norwegian:'النرويجية', Danish:'الدنماركية',
+    Finnish:'الفنلندية', Hebrew:'العبرية', Amharic:'الأمهرية', Somali:'الصومالية'
+  };
+
+  const countryDataCache = {};
+  async function fetchCountryData(code){
+    if(countryDataCache[code]) return countryDataCache[code];
+    const res = await fetch('https://restcountries.com/v3.1/alpha/' + code +
+      '?fields=capital,region,population,area,languages,currencies,timezones,capitalInfo,latlng');
+    if(!res.ok) throw new Error('country lookup failed');
+    const data = await res.json();
+    countryDataCache[code] = data;
+    return data;
+  }
+
+  async function fetchTemperature(lat, lon){
+    const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon + '&current_weather=true');
+    if(!res.ok) throw new Error('weather lookup failed');
+    const data = await res.json();
+    return data.current_weather;
+  }
+
+  function parseUtcOffsetMinutes(tzString){
+    if(!tzString || tzString === 'UTC') return 0;
+    const m = tzString.match(/UTC([+-])(\d{2}):(\d{2})/);
+    if(!m) return 0;
+    return (m[1] === '-' ? -1 : 1) * (parseInt(m[2],10)*60 + parseInt(m[3],10));
+  }
+
+  function formatClockFromOffset(offsetMinutes){
+    const now = new Date();
+    const utcMs = now.getTime() + now.getTimezoneOffset()*60000;
+    const d = new Date(utcMs + offsetMinutes*60000);
+    let h = d.getUTCHours();
+    const m = d.getUTCMinutes();
+    const ampm = h >= 12 ? (currentLang === 'ar' ? 'م' : 'PM') : (currentLang === 'ar' ? 'ص' : 'AM');
+    h = h % 12; if(h === 0) h = 12;
+    return h + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+  }
 
   // Local emergency service numbers per destination country. Sourced from
   // official/government pages and reputable travel-safety guides (checked via
@@ -2163,25 +2277,27 @@
   }
 
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-  let activeCountryInfo = null; // { code, details } while the card is visible
+  let activeCountryInfo = null; // { code, offsetMinutes } while the card is visible
 
   function updateCountryInfoTimes(){
     if(!activeCountryInfo) return;
     document.getElementById('countryInfoLocalTime').textContent = formatClock(userTimeZone);
-    document.getElementById('countryInfoDestTime').textContent = formatClock(activeCountryInfo.details.tz);
-    const diff = formatTimeDiff(tzOffsetMinutes(activeCountryInfo.details.tz) - tzOffsetMinutes(userTimeZone));
+    document.getElementById('countryInfoDestTime').textContent = formatClockFromOffset(activeCountryInfo.offsetMinutes);
+    const diff = formatTimeDiff(activeCountryInfo.offsetMinutes - tzOffsetMinutes(userTimeZone));
     document.getElementById('countryInfoDiff').textContent = currentLang === 'ar' ? diff.ar : diff.en;
   }
 
   function findCountryMatch(query){
     const q = query.trim().toLowerCase();
     if(q.length < 2) return null;
-    return COUNTRIES.find(c =>
-      (COUNTRY_DETAILS[c.code]) && (c.en.toLowerCase().includes(q) || c.ar.includes(query.trim()))
-    ) || null;
+    return COUNTRIES.find(c => c.en.toLowerCase().includes(q) || c.ar.includes(query.trim())) || null;
   }
 
-  function tryShowCountryInfo(){
+  const COUNTRY_INFO_FIELD_IDS = ['countryInfoContinent','countryInfoCapital','countryInfoPopulation','countryInfoLanguage','countryInfoCurrency','countryInfoArea','countryInfoTemp'];
+
+  let countryInfoRequestId = 0;
+
+  async function tryShowCountryInfo(){
     const card = document.getElementById('countryInfoCard');
     const input = document.getElementById('searchInput');
     if(!card || !input) return;
@@ -2196,33 +2312,78 @@
       activeCountryInfo = null;
       return;
     }
-    const d = COUNTRY_DETAILS[match.code];
-    activeCountryInfo = {code:match.code, details:d};
 
+    const myRequestId = ++countryInfoRequestId;
+    card.classList.add('show');
     document.getElementById('countryInfoFlag').textContent = countryFlagEmoji(match.code);
     document.getElementById('countryInfoName').textContent = currentLang === 'ar' ? match.ar : match.en;
     document.getElementById('countryInfoNameShort').textContent = currentLang === 'ar' ? match.ar : match.en;
-    document.getElementById('countryInfoContinent').textContent = currentLang === 'ar' ? d.continentAr : d.continentEn;
-    document.getElementById('countryInfoCapital').textContent = currentLang === 'ar' ? d.capitalAr : d.capitalEn;
-    document.getElementById('countryInfoPopulation').textContent = currentLang === 'ar' ? d.population : d.populationEn;
-    document.getElementById('countryInfoLanguage').textContent = currentLang === 'ar' ? d.languageAr : d.languageEn;
-    document.getElementById('countryInfoCurrency').textContent = currentLang === 'ar' ? d.currencyAr : d.currencyEn;
-    document.getElementById('countryInfoArea').textContent = currentLang === 'ar' ? d.area : d.areaEn;
-    document.getElementById('countryInfoTemp').textContent = d.temp + '°C';
-
-    const em = EMERGENCY_NUMBERS[match.code];
-    if(em){
-      document.getElementById('emergencyGeneralNumber').textContent = em.general;
-      document.getElementById('emergencyPoliceNumber').textContent = em.police;
-      document.getElementById('emergencyAmbulanceNumber').textContent = em.ambulance;
-      document.getElementById('emergencyFireNumber').textContent = em.fire;
-    }
-
+    COUNTRY_INFO_FIELD_IDS.forEach(id=>{
+      document.getElementById(id).textContent = currentLang === 'ar' ? '...جارٍ التحميل' : 'Loading…';
+    });
+    ['emergencyGeneralNumber','emergencyPoliceNumber','emergencyAmbulanceNumber','emergencyFireNumber'].forEach(id=>{
+      document.getElementById(id).textContent = '…';
+    });
     renderEmbassySection(match);
-
-    updateCountryInfoTimes();
-    card.classList.add('show');
     lucide.createIcons();
+
+    try{
+      const data = await fetchCountryData(match.code);
+      if(myRequestId !== countryInfoRequestId) return; // superseded by a newer lookup
+
+      const regionEn = data.region || '';
+      const capitalEn = (data.capital && data.capital[0]) || '—';
+      const popNum = data.population || 0;
+      const popFormatted = popNum >= 1e9 ? (popNum/1e9).toFixed(2) + 'B'
+        : popNum >= 1e6 ? (popNum/1e6).toFixed(1) + 'M'
+        : popNum ? popNum.toLocaleString() : '—';
+      const areaNum = data.area || 0;
+
+      const langNames = data.languages ? Object.values(data.languages) : [];
+      const langEn = langNames.slice(0,2).join(' / ') || '—';
+      const langAr = langNames.length ? langNames.slice(0,2).map(l => LANG_AR[l] || l).join(' / ') : '—';
+
+      const currencyEntries = data.currencies ? Object.entries(data.currencies) : [];
+      const currEn = currencyEntries.length ? (currencyEntries[0][1].name + ' (' + currencyEntries[0][0] + ')') : '—';
+      const currAr = currencyEntries.length ? (currencyEntries[0][0] + (currencyEntries[0][1].symbol ? ' (' + currencyEntries[0][1].symbol + ')' : '')) : '—';
+
+      document.getElementById('countryInfoContinent').textContent = currentLang === 'ar' ? (REGION_AR[regionEn] || regionEn || '—') : (regionEn || '—');
+      document.getElementById('countryInfoCapital').textContent = currentLang === 'ar' ? (CAPITAL_AR[match.code] || capitalEn) : capitalEn;
+      document.getElementById('countryInfoPopulation').textContent = popFormatted;
+      document.getElementById('countryInfoLanguage').textContent = currentLang === 'ar' ? langAr : langEn;
+      document.getElementById('countryInfoCurrency').textContent = currentLang === 'ar' ? currAr : currEn;
+      document.getElementById('countryInfoArea').textContent = areaNum ? areaNum.toLocaleString() + (currentLang === 'ar' ? ' كم²' : ' km²') : '—';
+
+      const offsetMinutes = parseUtcOffsetMinutes((data.timezones && data.timezones[0]) || 'UTC');
+      activeCountryInfo = {code: match.code, offsetMinutes};
+      updateCountryInfoTimes();
+
+      const latlng = (data.capitalInfo && data.capitalInfo.latlng) || data.latlng;
+      if(latlng && latlng.length === 2){
+        try{
+          const w = await fetchTemperature(latlng[0], latlng[1]);
+          if(myRequestId !== countryInfoRequestId) return;
+          document.getElementById('countryInfoTemp').textContent = (typeof w.temperature === 'number') ? Math.round(w.temperature) + '°C' : '—';
+        }catch(werr){
+          if(myRequestId === countryInfoRequestId) document.getElementById('countryInfoTemp').textContent = '—';
+        }
+      } else {
+        document.getElementById('countryInfoTemp').textContent = '—';
+      }
+
+      const em = EMERGENCY_NUMBERS[match.code];
+      const naText = currentLang === 'ar' ? 'غير متوفر بعد' : 'Not available yet';
+      document.getElementById('emergencyGeneralNumber').textContent = em ? em.general : naText;
+      document.getElementById('emergencyPoliceNumber').textContent = em ? em.police : naText;
+      document.getElementById('emergencyAmbulanceNumber').textContent = em ? em.ambulance : naText;
+      document.getElementById('emergencyFireNumber').textContent = em ? em.fire : naText;
+
+      lucide.createIcons();
+    }catch(err){
+      if(myRequestId !== countryInfoRequestId) return;
+      const failText = currentLang === 'ar' ? 'تعذّر التحميل' : 'Failed to load';
+      COUNTRY_INFO_FIELD_IDS.forEach(id=> document.getElementById(id).textContent = failText);
+    }
   }
   window.tryShowCountryInfo = tryShowCountryInfo;
 
@@ -2407,6 +2568,30 @@
     });
   });
 
+  // Trip list reflects real taps on the heart buttons below — session-only
+  // since there's no account/backend storage yet (noted on-screen too).
+  let savedTripItems = [];
+
+  function renderTripList(){
+    const container = document.getElementById('tripListContent');
+    if(!container) return;
+    if(!savedTripItems.length){
+      container.innerHTML = '<div class="booking-state"><i data-lucide="heart" width="24" height="24"></i><span>' +
+        (currentLang === 'ar' ? 'ما ضفت شي لقائمة رحلتك بعد — دوس القلب على أي وجهة' : "You haven't saved anything yet — tap the heart on any destination") +
+        '</span></div>';
+      return;
+    }
+    container.innerHTML = savedTripItems.map(item=>
+      '<div class="list-item" style="cursor:default;">' +
+        '<div class="list-icon"><i data-lucide="' + item.icon + '" width="19" height="19"></i></div>' +
+        '<div class="list-text"><h4>' + item.name + '</h4><span>' + (currentLang === 'ar' ? 'محفوظة بهالجلسة' : 'Saved this session') + '</span></div>' +
+        '<div class="list-meta"><i data-lucide="heart" width="17" height="17" style="color:var(--coral)" fill="currentColor"></i></div>' +
+      '</div>'
+    ).join('');
+    lucide.createIcons();
+  }
+  window.renderTripList = renderTripList;
+
   // Favorite / save toggles on destination cards — tapping the heart
   // shouldn't also open the card's detail screen.
   document.querySelectorAll('.fav-toggle').forEach(btn=>{
@@ -2414,6 +2599,16 @@
       e.stopPropagation();
       btn.classList.toggle('active');
       const saved = btn.classList.contains('active');
+      const card = btn.closest('.dest-card');
+      const nameEl = card && card.querySelector('.dest-body h3');
+      const name = nameEl ? nameEl.textContent : (currentLang === 'ar' ? 'وجهة' : 'Destination');
+      const id = 'dest:' + name;
+      if(saved){
+        if(!savedTripItems.some(i=>i.id===id)) savedTripItems.push({id, name, icon:'map-pin'});
+      } else {
+        savedTripItems = savedTripItems.filter(i=>i.id!==id);
+      }
+      renderTripList();
       showToast(
         currentLang === 'ar'
           ? (saved ? 'أضيفت للمفضلة' : 'أزيلت من المفضلة')
@@ -2429,6 +2624,15 @@
     detailFavBtn.addEventListener('click', ()=>{
       detailFavBtn.classList.toggle('active');
       const saved = detailFavBtn.classList.contains('active');
+      const nameEl = document.querySelector('#screen-detail .brand-name');
+      const name = nameEl ? nameEl.textContent : (currentLang === 'ar' ? 'وجهة' : 'Destination');
+      const id = 'detail:' + name;
+      if(saved){
+        if(!savedTripItems.some(i=>i.id===id)) savedTripItems.push({id, name, icon:'landmark'});
+      } else {
+        savedTripItems = savedTripItems.filter(i=>i.id!==id);
+      }
+      renderTripList();
       showToast(
         currentLang === 'ar'
           ? (saved ? 'أضيفت لقائمة رحلتك' : 'أزيلت من قائمة رحلتك')
@@ -2589,17 +2793,12 @@
   const DEST_COORDS = {lat:-54.8019, lon:-68.3029}; // Ushuaia, Argentina
   const VERIFY_RADIUS_KM = 25;
 
-  const reviews = [
-    {name:'كريم', nameEn:'Kareem', initial:'ك', rating:5,
-      text:'الجو صعب بس المنظر ما إله مثيل، رحلة العمر فعلاً.',
-      textEn:'Weather is tough but the view has no equal — trip of a lifetime.'},
-    {name:'هبة', nameEn:'Heba', initial:'هـ', rating:4,
-      text:'المرفأ منظم كتير والعبّارات لأنتاركتيكا موثوقة.',
-      textEn:'The port is very organized and the ferries to Antarctica are reliable.'},
-    {name:'طارق', nameEn:'Tarek', initial:'ط', rating:5,
-      text:'Polar Latitude فعلاً محترفين، ما ندمت على السعر.',
-      textEn:'Polar Latitude were truly professional — worth every dollar.'},
-  ];
+  // No pre-seeded reviews — every entry here was actually GPS-verified via
+  // the flow below. Fabricating "verified" reviews would be dishonest, so we
+  // start empty. Note: since there's no backend yet, submitted reviews only
+  // persist for this browser session (they reset on reload) — that's an
+  // honest limitation, not fake data.
+  const reviews = [];
 
   function stars(n){ return '★★★★★☆☆☆☆☆'.slice(5-n, 10-n); }
 
@@ -2607,6 +2806,12 @@
     const list = document.getElementById('reviewsList');
     if(!list) return;
     list.innerHTML = '';
+    if(!reviews.length){
+      list.innerHTML = '<div class="booking-state"><i data-lucide="badge-check" width="22" height="22"></i><span>' +
+        (currentLang === 'ar' ? 'ما فيه تقييمات موثقة بعد — كن أول زائر يتحقق من زيارته' : 'No verified reviews yet — be the first to verify your visit') +
+        '</span></div>';
+      return;
+    }
     reviews.forEach(r=>{
       const el = document.createElement('div');
       el.className = 'review-item';
@@ -3446,6 +3651,8 @@
   populateCountrySelects();
   populateCountryDatalist();
   renderSearchResults();
+  renderTripList();
+  renderMuslimCorner();
 
 </script>
 </body>
