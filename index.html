@@ -57,7 +57,7 @@
   /* ---------- Wave header ---------- */
   .wave-header{
     position:relative;
-    background:linear-gradient(160deg,var(--deep-navy) 0%, var(--ocean) 100%);
+    background:var(--deep-navy);
     padding:22px 20px 46px;
     color:var(--foam);
     border-radius:0 0 42% 42%/0 0 34px 34px;
@@ -1458,7 +1458,7 @@
 </div>
 
 <script>
-  lucide.createIcons();
+  safeCreateIcons();
 
   let currentLang = 'en';
   const titleEl = document.getElementById('pageTitle');
@@ -1712,7 +1712,7 @@
     }
     document.getElementById('signupStepAuth').style.display = 'none';
     document.getElementById('signupStepDetails').style.display = 'block';
-    lucide.createIcons();
+    safeCreateIcons();
   }
   window.chooseSignupProvider = chooseSignupProvider;
 
@@ -1748,7 +1748,7 @@
     document.querySelectorAll('.theme-toggle-btn i').forEach(icon=>{
       icon.setAttribute('data-lucide', theme === 'dark' ? 'sun' : 'moon');
     });
-    lucide.createIcons();
+    safeCreateIcons();
     currentTheme = theme;
   }
   function toggleTheme(){
@@ -1878,7 +1878,7 @@
     const myId = ++searchRequestId;
     listEl.innerHTML = '<div class="booking-state"><i data-lucide="loader-circle" width="22" height="22"></i><span>' +
       (currentLang === 'ar' ? 'عم نبحث عن أماكن حقيقية…' : 'Searching real places…') + '</span></div>';
-    lucide.createIcons();
+    safeCreateIcons();
 
     try{
       const place = await geocodeQuery(query);
@@ -1928,7 +1928,7 @@
           '<div class="list-meta"><small>' + formatDistKm(poi.distKm) + '</small></div>' +
         '</div>';
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }catch(err){
       if(myId !== searchRequestId) return;
       listEl.innerHTML = '<div class="booking-state"><i data-lucide="wifi-off" width="24" height="24"></i><span>' +
@@ -1957,7 +1957,7 @@
     document.getElementById('poiSheetDist').textContent = formatDistKm(poi.distKm) || '—';
     document.getElementById('poiSheetHotelCta').style.display = poi.cat === 'hotel' ? 'flex' : 'none';
     document.getElementById('poiSheetBackdrop').classList.add('show');
-    lucide.createIcons();
+    safeCreateIcons();
   }
   window.openPoiSheet = openPoiSheet;
 
@@ -2057,7 +2057,7 @@
         '<div class="list-meta"><small>' + formatDistKm(p.distKm) + '</small></div>' +
       '</div>';
     }).join('');
-    lucide.createIcons();
+    safeCreateIcons();
   }
 
   function renderMuslimCorner(){
@@ -2309,7 +2309,7 @@
       document.getElementById(id).textContent = '…';
     });
     renderEmbassySection(match);
-    lucide.createIcons();
+    safeCreateIcons();
 
     try{
       const data = await fetchCountryData(match.code);
@@ -2362,7 +2362,7 @@
       document.getElementById('emergencyAmbulanceNumber').textContent = em ? em.ambulance : naText;
       document.getElementById('emergencyFireNumber').textContent = em ? em.fire : naText;
 
-      lucide.createIcons();
+      safeCreateIcons();
     }catch(err){
       if(myRequestId !== countryInfoRequestId) return;
       const failText = currentLang === 'ar' ? 'تعذّر التحميل' : 'Failed to load';
@@ -2436,12 +2436,20 @@
     if(!el) return;
     document.getElementById('appToastMsg').textContent = msg;
     if(icon) el.querySelector('i').setAttribute('data-lucide', icon);
-    lucide.createIcons();
+    safeCreateIcons();
     el.classList.add('show');
     clearTimeout(appToastTimer);
     appToastTimer = setTimeout(()=> el.classList.remove('show'), 2200);
   }
   window.showToast = showToast;
+
+  // If the Lucide CDN fails to load (slow/offline network, blocked script),
+  // icons just won't render instead of crashing every script below it.
+  function safeCreateIcons(){
+    if(typeof lucide !== 'undefined' && lucide.createIcons){
+      try{ lucide.createIcons(); }catch(e){}
+    }
+  }
 
   function goToScreen(screenId){
     document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
@@ -2521,7 +2529,7 @@
       setLocalizedText(pill.querySelector('span'), theme.labelAr, theme.labelEn);
     }
 
-    lucide.createIcons();
+    safeCreateIcons();
   }
 
   function syncTripTypeControls(type){
@@ -2572,7 +2580,7 @@
         '<div class="list-meta"><i data-lucide="heart" width="17" height="17" style="color:var(--coral)" fill="currentColor"></i></div>' +
       '</div>'
     ).join('');
-    lucide.createIcons();
+    safeCreateIcons();
   }
   window.renderTripList = renderTripList;
 
@@ -2812,7 +2820,7 @@
         '<div class="review-text">'+ (currentLang==='ar' ? r.text : r.textEn) +'</div>';
       list.appendChild(el);
     });
-    lucide.createIcons();
+    safeCreateIcons();
   }
 
   function haversineKm(lat1, lon1, lat2, lon2){
@@ -2865,7 +2873,7 @@
         '<div class="verify-status fail">'+payload.msg+'</div>' +
         '<button class="verify-btn" style="margin-top:12px" onclick="requestLocationVerification()"><i data-lucide="rotate-ccw" width="16" height="16"></i>'+t('حاول مرة ثانية','Try again')+'</button>';
     }
-    lucide.createIcons();
+    safeCreateIcons();
   }
 
   function setRating(n){
@@ -2966,7 +2974,7 @@
         '<span>'+label+'</span>';
       strip.appendChild(thumb);
     });
-    lucide.createIcons();
+    safeCreateIcons();
   }
 
   function buildReelsProgress(){
@@ -3067,7 +3075,7 @@
       : kind === 'error' ? '<i data-lucide="wifi-off" width="26" height="26"></i>'
       : '<i data-lucide="map-pin" width="26" height="26"></i>';
     box.innerHTML = '<div class="booking-state' + (kind === 'error' ? ' error' : '') + '">' + icon + '<span>' + message + '</span></div>';
-    lucide.createIcons();
+    safeCreateIcons();
   }
 
   async function searchBookingDestinations(){
@@ -3108,7 +3116,7 @@
           '<span>' + (r.hierarchyInfo && r.hierarchyInfo.country && r.hierarchyInfo.country.name || '') + '</span></div>' +
           '</div>';
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }catch(err){
       if(myToken !== bookingSearchToken) return;
       renderBookingState('error', currentLang === 'ar'
@@ -3158,7 +3166,7 @@
         '</div>' +
         '<button class="cta-btn" onclick="searchHotelPrices()"><i data-lucide="search" width="17" height="17"></i><span data-en="Search hotels">دور على الفنادق</span></button>' +
       '</div>';
-    lucide.createIcons();
+    safeCreateIcons();
     applyLang(currentLang);
   }
   window.selectBookingDestination = selectBookingDestination;
@@ -3184,7 +3192,7 @@
         '<span>' + (r.hierarchyInfo && r.hierarchyInfo.country && r.hierarchyInfo.country.name || '') + '</span></div>' +
         '</div>';
     }).join('');
-    lucide.createIcons();
+    safeCreateIcons();
   }
   window.backToBookingSearch = backToBookingSearch;
 
@@ -3329,7 +3337,7 @@
             '</div>' +
           '</div>';
         }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
       applyLang(currentLang);
     }catch(err){
       if(myToken !== bookingSearchToken) return;
@@ -3384,7 +3392,7 @@
     input.placeholder = currentLang === 'ar' ? 'من وين رح تسافر؟' : 'Where are you flying from?';
     document.getElementById('bookingResultsTitle').textContent = currentLang === 'ar' ? 'اختر مطار الانطلاق' : 'Choose departure airport';
     document.getElementById('bookingResults').innerHTML = '<div class="booking-state"><i data-lucide="plane-takeoff" width="26" height="26"></i><span>' + (currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above') + '</span></div>';
-    lucide.createIcons();
+    safeCreateIcons();
   }
   window.resetFlightSearch = resetFlightSearch;
 
@@ -3421,7 +3429,7 @@
           '<div class="list-text"><h4>' + title + '</h4><span>' + subtitle + '</span></div>' +
           '</div>';
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }catch(err){
       if(myToken !== bookingSearchToken) return;
       renderBookingState('error', currentLang === 'ar' ? 'تعذّر الاتصال. تأكد من الإنترنت.' : 'Could not connect. Check your internet.');
@@ -3462,7 +3470,7 @@
       input.placeholder = currentLang === 'ar' ? 'وين رح تسافر؟' : 'Where are you flying to?';
       titleEl.textContent = currentLang === 'ar' ? 'اختر مطار الوصول' : 'Choose arrival airport';
       document.getElementById('bookingResults').innerHTML = '<div class="booking-state"><i data-lucide="plane-landing" width="26" height="26"></i><span>' + (currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above') + '</span></div>';
-      lucide.createIcons();
+      safeCreateIcons();
     } else if(flightStep === 'destination'){
       flightDestination = picked;
       flightStep = 'dates';
@@ -3499,7 +3507,7 @@
         '</div>' +
         '<button class="cta-btn" onclick="searchFlightItineraries()"><i data-lucide="search" width="17" height="17"></i><span data-en="Search flights">دور على الرحلات</span></button>' +
       '</div>';
-    lucide.createIcons();
+    safeCreateIcons();
     applyLang(currentLang);
   }
   window.renderFlightDatesForm = renderFlightDatesForm;
@@ -3512,7 +3520,7 @@
     input.placeholder = currentLang === 'ar' ? 'من وين رح تسافر؟' : 'Where are you flying from?';
     document.getElementById('bookingResultsTitle').textContent = currentLang === 'ar' ? 'اختر مطار الانطلاق' : 'Choose departure airport';
     document.getElementById('bookingResults').innerHTML = '<div class="booking-state"><i data-lucide="plane-takeoff" width="26" height="26"></i><span>' + (currentLang === 'ar' ? 'اكتب اسم مدينة أو مطار فوق' : 'Type a city or airport above') + '</span></div>';
-    lucide.createIcons();
+    safeCreateIcons();
   }
   window.backToFlightOrigin = backToFlightOrigin;
 
@@ -3622,7 +3630,7 @@
             '</div>' +
           '</div>';
         }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }catch(err){
       if(myToken !== bookingSearchToken) return;
       renderBookingState('error', currentLang === 'ar' ? 'تعذّر جلب أسعار الرحلات. حاول مرة ثانية.' : 'Could not fetch flight prices. Try again.');
@@ -3666,7 +3674,7 @@
 
     const myToken = ++homeOriginSearchToken;
     resultsEl.innerHTML = '<div class="booking-state"><i data-lucide="loader-circle" width="20" height="20"></i><span>' + (currentLang === 'ar' ? 'عم نبحث…' : 'Searching…') + '</span></div>';
-    lucide.createIcons();
+    safeCreateIcons();
     try{
       const url = BOOKING_PROXY.replace('/api/hotels', '/api/flights') + '?path=api/v1/flights/searchAirport&query=' + encodeURIComponent(query) + '&locale=en-US';
       const res = await fetch(url);
@@ -3687,7 +3695,7 @@
           '<div class="list-text"><h4>' + title + '</h4><span>' + subtitle + '</span></div>' +
         '</div>';
       }).join('');
-      lucide.createIcons();
+      safeCreateIcons();
     }catch(err){
       if(myToken !== homeOriginSearchToken) return;
       resultsEl.innerHTML = '<div class="booking-state"><i data-lucide="wifi-off" width="20" height="20"></i><span>' + (currentLang === 'ar' ? 'تعذّر الاتصال' : 'Could not connect') + '</span></div>';
