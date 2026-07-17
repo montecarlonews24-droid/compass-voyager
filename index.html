@@ -186,6 +186,14 @@
   .dest-tags{display:flex; gap:5px; margin-top:8px;}
   .tag{font-size:9px; background:var(--seafoam); color:var(--ocean); padding:3px 7px; border-radius:20px; font-weight:700;}
 
+  .origin-picker-row{
+    display:flex; align-items:center; gap:8px; background:var(--sand); border-radius:14px;
+    padding:11px 14px; margin-bottom:14px; cursor:pointer; font-size:11.5px; font-weight:700; color:var(--ink);
+  }
+  .origin-picker-row i:first-child{color:var(--ocean); flex-shrink:0;}
+  .origin-picker-row span{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .origin-picker-row i:last-child{color:var(--ink-soft); flex-shrink:0;}
+
   /* Mode dashboard tabs */
   .mode-tabs{display:flex; background:var(--sand-deep); border-radius:16px; padding:4px; gap:4px;}
   .mode-tab{
@@ -1032,6 +1040,11 @@
       </div>
 
       <!-- Suggested destinations -->
+      <div class="origin-picker-row" onclick="openOriginPicker()">
+        <i data-lucide="plane-takeoff" width="16" height="16"></i>
+        <span id="homeOriginLabel" data-en="Set your departure airport for real flight times">حدد مطار انطلاقك لعرض أوقات طيران حقيقية</span>
+        <i data-lucide="chevron-left" width="16" height="16"></i>
+      </div>
       <div class="section-title">
         <h2 data-en="Destinations for you">وجهات تناسبك</h2>
         <span class="link" onclick="goToScreen('screen-search')" data-en="See all">عرض الكل</span>
@@ -1040,7 +1053,7 @@
         <div class="dest-card" data-trip-type="mountain">
           <div class="dest-img" style="background:linear-gradient(135deg,#0071C2,#003580)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
-            <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 5س 20د</span>
+            <span class="fly-badge" data-dest-query="Ushuaia, Argentina"><i data-lucide="plane" width="11" height="11"></i> <b class="fly-badge-text" data-en="Set origin">حدد الانطلاق</b></span>
           </div>
           <div class="dest-body">
             <h3 data-en="Ushuaia, Argentina">أوشوايا، الأرجنتين</h3>
@@ -1051,7 +1064,7 @@
         <div class="dest-card" data-trip-type="culture">
           <div class="dest-img" style="background:linear-gradient(135deg,#0090D9,#003580)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
-            <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 3س 40د</span>
+            <span class="fly-badge" data-dest-query="Istanbul, Turkey"><i data-lucide="plane" width="11" height="11"></i> <b class="fly-badge-text" data-en="Set origin">حدد الانطلاق</b></span>
           </div>
           <div class="dest-body">
             <h3 data-en="Istanbul, Turkey">إسطنبول، تركيا</h3>
@@ -1062,7 +1075,7 @@
         <div class="dest-card" data-trip-type="leisure">
           <div class="dest-img" style="background:linear-gradient(135deg,#003580,#001B40)">
             <div class="fav-toggle"><i data-lucide="heart" width="14" height="14"></i></div>
-            <span class="fly-badge"><i data-lucide="plane" width="11" height="11"></i> 2س 10د</span>
+            <span class="fly-badge" data-dest-query="Muscat, Oman"><i data-lucide="plane" width="11" height="11"></i> <b class="fly-badge-text" data-en="Set origin">حدد الانطلاق</b></span>
           </div>
           <div class="dest-body">
             <h3 data-en="Muscat, Oman">مسقط، عُمان</h3>
@@ -1456,6 +1469,22 @@
         <i data-lucide="bed-double" width="17" height="17"></i>
         <span data-en="Search real hotels with photos">دور على فنادق حقيقية بصور</span>
       </button>
+    </div>
+  </div>
+
+  <!-- ================= ORIGIN AIRPORT PICKER ================= -->
+  <div class="poi-sheet-backdrop" id="originPickerBackdrop" onclick="if(event.target===this) closeOriginPicker()">
+    <div class="poi-sheet">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h3 style="margin:0; font-size:15px; color:var(--ink);" data-en="Your departure airport">مطار انطلاقك</h3>
+        <div style="width:30px; height:30px; border-radius:50%; background:var(--sand); color:var(--ink); display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="closeOriginPicker()"><i data-lucide="x" width="16" height="16"></i></div>
+      </div>
+      <div class="search-bar" style="margin-bottom:10px;">
+        <i data-lucide="search" width="16" height="16"></i>
+        <input type="text" id="originPickerInput" placeholder="اكتب مدينة أو مطار…" data-en-placeholder="Type a city or airport…" oninput="searchOriginAirports()">
+      </div>
+      <div id="originPickerResults"></div>
+      <p class="country-info-note" data-en="Real airline data — same source used in the Flights search." style="margin-top:10px;">بيانات طيران حقيقية — نفس المصدر المستخدم ببحث الرحلات.</p>
     </div>
   </div>
 
@@ -3645,6 +3674,139 @@
     }
   }
   window.searchFlightItineraries = searchFlightItineraries;
+
+  // ---------- Home screen: real flight durations ----------
+  // Reuses the same live flight-search proxy as the Flights tab. We need a
+  // departure airport from the person first (no origin = no real duration to
+  // show, so we don't fabricate one).
+  let homeOriginAirport = null;
+  let homeOriginSearchResults = [];
+  let homeOriginSearchToken = 0;
+  let originSearchDebounce = null;
+  const destAirportCache = {};
+
+  function openOriginPicker(){
+    document.getElementById('originPickerBackdrop').classList.add('show');
+    const input = document.getElementById('originPickerInput');
+    if(input) input.focus();
+  }
+  window.openOriginPicker = openOriginPicker;
+
+  function closeOriginPicker(){
+    document.getElementById('originPickerBackdrop').classList.remove('show');
+  }
+  window.closeOriginPicker = closeOriginPicker;
+
+  function searchOriginAirports(){
+    clearTimeout(originSearchDebounce);
+    originSearchDebounce = setTimeout(runOriginAirportSearch, 500);
+  }
+  window.searchOriginAirports = searchOriginAirports;
+
+  async function runOriginAirportSearch(){
+    const input = document.getElementById('originPickerInput');
+    const query = input.value.trim();
+    const resultsEl = document.getElementById('originPickerResults');
+    if(query.length < 2){ resultsEl.innerHTML = ''; return; }
+
+    const myToken = ++homeOriginSearchToken;
+    resultsEl.innerHTML = '<div class="booking-state"><i data-lucide="loader-circle" width="20" height="20"></i><span>' + (currentLang === 'ar' ? 'عم نبحث…' : 'Searching…') + '</span></div>';
+    lucide.createIcons();
+    try{
+      const url = BOOKING_PROXY.replace('/api/hotels', '/api/flights') + '?path=api/v1/flights/searchAirport&query=' + encodeURIComponent(query) + '&locale=en-US';
+      const res = await fetch(url);
+      if(myToken !== homeOriginSearchToken) return;
+      if(!res.ok) throw new Error('bad-response');
+      const data = await res.json();
+      const results = Array.isArray(data && data.data) ? data.data : [];
+      homeOriginSearchResults = results.slice(0, 8);
+      if(!homeOriginSearchResults.length){
+        resultsEl.innerHTML = '<div class="booking-state"><i data-lucide="search-x" width="20" height="20"></i><span>' + (currentLang === 'ar' ? 'ما لقينا نتائج' : 'No matches found') + '</span></div>';
+        return;
+      }
+      resultsEl.innerHTML = homeOriginSearchResults.map((r,i)=>{
+        const title = (r.presentation && r.presentation.title) || '';
+        const subtitle = (r.presentation && r.presentation.subtitle) || '';
+        return '<div class="list-item" onclick="selectOriginAirport(' + i + ')">' +
+          '<div class="list-icon"><i data-lucide="plane-takeoff" width="18" height="18"></i></div>' +
+          '<div class="list-text"><h4>' + title + '</h4><span>' + subtitle + '</span></div>' +
+        '</div>';
+      }).join('');
+      lucide.createIcons();
+    }catch(err){
+      if(myToken !== homeOriginSearchToken) return;
+      resultsEl.innerHTML = '<div class="booking-state"><i data-lucide="wifi-off" width="20" height="20"></i><span>' + (currentLang === 'ar' ? 'تعذّر الاتصال' : 'Could not connect') + '</span></div>';
+    }
+  }
+
+  function selectOriginAirport(i){
+    const r = homeOriginSearchResults[i];
+    if(!r) return;
+    homeOriginAirport = extractAirportParams(r);
+    closeOriginPicker();
+    document.getElementById('homeOriginLabel').textContent = (currentLang === 'ar' ? 'الانطلاق من: ' : 'Flying from: ') + homeOriginAirport.name;
+    updateHomeFlightBadges();
+  }
+  window.selectOriginAirport = selectOriginAirport;
+
+  async function resolveDestAirport(query){
+    if(destAirportCache[query]) return destAirportCache[query];
+    const url = BOOKING_PROXY.replace('/api/hotels', '/api/flights') + '?path=api/v1/flights/searchAirport&query=' + encodeURIComponent(query) + '&locale=en-US';
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('airport lookup failed');
+    const data = await res.json();
+    const results = Array.isArray(data && data.data) ? data.data : [];
+    if(!results.length) return null;
+    const picked = extractAirportParams(results[0]);
+    destAirportCache[query] = picked;
+    return picked;
+  }
+
+  function futureDateStr(daysAhead){
+    const d = new Date();
+    d.setDate(d.getDate() + daysAhead);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  async function updateHomeFlightBadges(){
+    if(!homeOriginAirport) return;
+    const badges = document.querySelectorAll('#screen-home .fly-badge[data-dest-query]');
+    for(const badge of badges){
+      const textEl = badge.querySelector('.fly-badge-text');
+      textEl.textContent = '…';
+      try{
+        const destAirport = await resolveDestAirport(badge.dataset.destQuery);
+        if(!destAirport){ textEl.textContent = currentLang === 'ar' ? 'غير متاح' : 'N/A'; continue; }
+
+        const params = new URLSearchParams({
+          originSkyId: homeOriginAirport.skyId,
+          destinationSkyId: destAirport.skyId,
+          originEntityId: homeOriginAirport.entityId,
+          destinationEntityId: destAirport.entityId,
+          date: futureDateStr(21),
+          cabinClass: 'economy',
+          adults: '1',
+          currency: 'USD',
+          market: 'en-US',
+          countryCode: 'US',
+          sortBy: 'best',
+        });
+        const url = BOOKING_PROXY.replace('/api/hotels', '/api/flights') + '?path=api/v1/flights/searchFlights&' + params.toString();
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('flight search failed');
+        const data = await res.json();
+        const itineraries = (data && data.data && data.data.itineraries) || [];
+        const leg = itineraries[0] && itineraries[0].legs && itineraries[0].legs[0];
+        const mins = leg && (leg.durationInMinutes || leg.duration);
+        if(!mins){ textEl.textContent = currentLang === 'ar' ? 'غير متاح' : 'N/A'; continue; }
+        const h = Math.floor(mins/60), m = mins%60;
+        textEl.textContent = currentLang === 'ar' ? (h + 'س ' + m + 'د') : (h + 'h ' + m + 'm');
+      }catch(err){
+        textEl.textContent = currentLang === 'ar' ? 'غير متاح' : 'N/A';
+      }
+    }
+  }
+  window.updateHomeFlightBadges = updateHomeFlightBadges;
 
   // English is now the app's primary/default language.
   applyLang('en');
